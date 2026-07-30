@@ -1,2 +1,5 @@
 allowBuilds:
+  '@prisma/engines': true
+  '@scarf/scarf': false
+  prisma: true
   unrs-resolver: set this to true or false
