@@ -37,6 +37,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
             statusCode,
             data: null,
             correlationId,
+            userIP: request.ip,
             timestamp: new Date().toISOString(),
             error: {
                 code,

@@ -1,16 +1,18 @@
 enum UserStatus {
-    PENDING
     ACTIVE
+    BANNED
     SUSPENDED
+    DELETED
 }
 
 model User {
-    id                  String     @id @default(uuid())
+    id                  String     @id @default(uuid()) @db.Uuid
     email               String     @unique @db.VarChar(255)
     username            String     @unique @db.VarChar(50)
     passwordHash        String     @db.VarChar(255)
-    status              UserStatus @default(PENDING)
+    status              UserStatus @default(ACTIVE)
     emailVerifiedAt     DateTime?  @db.Timestamptz(6)
+    emailVerificationTokens VerificationToken[]
     failedLoginAttempts Int        @default(0)
     lockedUntil         DateTime?  @db.Timestamptz(6)
     lastLoginAt         DateTime?  @db.Timestamptz(6)

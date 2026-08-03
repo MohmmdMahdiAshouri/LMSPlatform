@@ -17,8 +17,7 @@
     "paths": {
       "@shared/*": ["./src/shared/*"],
       "@modules/*": ["./src/modules/*"],
-      "@config/*": ["./src/config/*"],
-      "@prisma/*": ["./src/prisma/*"]
+      "@src/*": ["./src/*"]
     },
     "incremental": true,
     "skipLibCheck": true,
