@@ -1,0 +1,11 @@
+export const USER_REPOSITORY = Symbol('USER_REPOSITORY');
+
+export const VERIFICATION_TOKEN_REPOSITORY = Symbol('VERIFICATION_TOKEN_REPOSITORY');
+
+export const PASSWORD_HASHER = Symbol('PASSWORD_HASHER');
+
+export const TOKEN_GENERATOR = Symbol('TOKEN_GENERATOR');
+
+export const TOKEN_HASHER = Symbol('TOKEN_HASHER');
+
+export const CLOCK = Symbol('CLOCK');
