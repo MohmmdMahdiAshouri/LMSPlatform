@@ -1,13 +1,13 @@
 model VerificationToken {
-    id String @id @default(uuid()) @db.Uuid
-    userId String @db.Uuid 
-    tokenHash String @db.VarChar(255)
-    expiresAt DateTime @db.Timestamptz(6)
-    usedAt DateTime? @db.Timestamptz(6)
+    id        String    @id @default(uuid()) @db.Uuid
+    userId    String    @db.Uuid
+    tokenHash String    @db.VarChar(255)
+    expiresAt DateTime  @db.Timestamptz(6)
+    usedAt    DateTime? @db.Timestamptz(6)
     revokedAt DateTime? @db.Timestamptz(6)
-    createdAt DateTime @default(now()) @db.Timestamptz(6)
-
-    @@index([userId], name: "idx_verification_token_user_id")
+    createdAt DateTime  @default(now()) @db.Timestamptz(6)
 
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId], name: "idx_verification_token_user_id")
 }
