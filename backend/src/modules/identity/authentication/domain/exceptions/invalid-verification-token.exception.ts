@@ -2,7 +2,7 @@ import { BusinessRuleViolationException } from '@shared/error-handling/common/bu
 import { AuthErrorCode } from '../enums/auth-error-code.enum';
 
 export class NotUsableVerificationTokenException extends BusinessRuleViolationException {
-    constructor(token: string) {
-        super(AuthErrorCode.NOT_USABLE_VERIFICATION_TOKEN, `Verification token ${token} is not usable.`, { token });
+    constructor() {
+        super(AuthErrorCode.NOT_USABLE_VERIFICATION_TOKEN, `Your verification token is not usable.`);
     }
 }

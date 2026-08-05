@@ -5,7 +5,7 @@ export class PasswordHash {
 
     static create(hash: string): PasswordHash {
         if (!hash) {
-            throw new InvalidPasswordhashException(hash);
+            throw new InvalidPasswordhashException();
         }
 
         return new PasswordHash(hash);
