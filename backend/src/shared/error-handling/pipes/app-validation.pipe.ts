@@ -1,30 +1,35 @@
-import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
-import { plainToInstance, ClassConstructor } from 'class-transformer';
-import { validate } from 'class-validator';
+import { Injectable, ValidationPipe } from '@nestjs/common';
+import type { ValidationError as ClassValidatorError } from 'class-validator';
 import { ValidationError as AppValidationError } from '../common/validation.error';
 
 @Injectable()
-export class AppValidationPipe implements PipeTransform<unknown> {
-    async transform(value: unknown, { metatype }: ArgumentMetadata): Promise<unknown> {
-        if (!metatype || !this.shouldValidate(metatype)) return value;
-
-        const targetType = metatype as ClassConstructor<object>;
-        const object: object = plainToInstance<object, unknown>(targetType, value);
-
-        const errors = await validate(object);
-
-        if (errors.length > 0) {
-            const fieldErrors = errors.map((err) => ({
-                field: err.property,
-                message: Object.values(err.constraints ?? {}).join(', '),
-            }));
-            throw new AppValidationError(fieldErrors);
-        }
-        return object;
+export class AppValidationPipe extends ValidationPipe {
+    constructor() {
+        super({
+            whitelist: true,
+            transform: true,
+            forbidNonWhitelisted: true,
+            exceptionFactory: (errors: ClassValidatorError[]) => {
+                const fieldErrors = AppValidationPipe.flattenErrors(errors);
+                return new AppValidationError(fieldErrors);
+            },
+        });
     }
 
-    private shouldValidate(metatype: new (...args: unknown[]) => unknown): boolean {
-        const primitives: Array<unknown> = [String, Boolean, Number, Array, Object];
-        return !primitives.includes(metatype);
+    private static flattenErrors(
+        errors: ClassValidatorError[],
+        parentPath = '',
+    ): Array<{ field: string; message: string }> {
+        const result: Array<{ field: string; message: string }> = [];
+        for (const err of errors) {
+            const path = parentPath ? `${parentPath}.${err.property}` : err.property;
+            if (err.constraints) {
+                result.push({ field: path, message: Object.values(err.constraints).join(', ') });
+            }
+            if (err.children?.length) {
+                result.push(...AppValidationPipe.flattenErrors(err.children, path));
+            }
+        }
+        return result;
     }
 }
