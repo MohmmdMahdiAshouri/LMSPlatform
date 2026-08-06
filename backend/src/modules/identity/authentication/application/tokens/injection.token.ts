@@ -9,3 +9,7 @@ export const TOKEN_GENERATOR = Symbol('TOKEN_GENERATOR');
 export const TOKEN_HASHER = Symbol('TOKEN_HASHER');
 
 export const CLOCK = Symbol('CLOCK');
+
+export const SESSION_REPOSITORY = Symbol('SESSION_REPOSITORY');
+
+export const REFRESH_TOKEN_REPOSITORY = Symbol('REFRESH_TOKEN_REPOSITORY');
