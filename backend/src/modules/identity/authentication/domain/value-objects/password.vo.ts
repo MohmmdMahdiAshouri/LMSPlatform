@@ -18,7 +18,7 @@ export class Password {
 
     static create(password: string): Password {
         if (!this.PASSWORD_REGEX.test(password)) {
-            throw new PasswordIsWeakException(password);
+            throw new PasswordIsWeakException();
         }
 
         return new Password(password);

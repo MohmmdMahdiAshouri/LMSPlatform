@@ -30,7 +30,7 @@ export class VerificationToken {
 
     use(): void {
         if (!this.isUsable()) {
-            throw new NotUsableVerificationTokenException(this.tokenHash);
+            throw new NotUsableVerificationTokenException();
         }
         this.usedAt = new Date();
     }

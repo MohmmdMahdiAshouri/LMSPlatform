@@ -5,6 +5,8 @@ import { PrismaUserRepository } from './infrastructure/persistence/prisma-user.r
 import {
     CLOCK,
     PASSWORD_HASHER,
+    REFRESH_TOKEN_REPOSITORY,
+    SESSION_REPOSITORY,
     TOKEN_GENERATOR,
     TOKEN_HASHER,
     USER_REPOSITORY,
@@ -18,14 +20,37 @@ import { SystemClock } from './infrastructure/security/system-clock';
 import { Sha256TokenHasher } from './infrastructure/security/sha256-token-hasher';
 import { CryptoTokenGenerator } from './infrastructure/security/crypto-token-generator';
 import { PrismaVerificationTokenRepository } from './infrastructure/persistence/prisma-verification-token.repository';
-
+import { AuthenticationService } from './application/services/authentication.service';
+import { JwtModule } from '@nestjs/jwt';
+import { AccessTokenGenerator } from './application/ports/access-token-generator.port';
+import { JwtTokenGenerator } from './infrastructure/security/jwt-token-generator';
+import { PrismaSessionRepository } from './infrastructure/persistence/prisma-session.respository';
+import { PrismaRefreshTokenRepository } from './infrastructure/persistence/prisma-refresh-token.repository';
+import { VerifyEmailHandler } from './application/commands/verify-email/verify-email.handler';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthenticationContextMapper } from './presentation/mappers/authentication-context.mapper';
 @Module({
-    imports: [CqrsModule],
+    imports: [
+        CqrsModule,
+        JwtModule.registerAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: (configService: ConfigService) => ({
+                secret: configService.get<string>('JWT_ACCESS_SECRET'),
+                signOptions: {
+                    expiresIn: '15m',
+                },
+            }),
+        }),
+    ],
     controllers: [AuthenticationController],
     providers: [
         RegisterHandler,
+        VerifyEmailHandler,
         VerificationTokenFactory,
         UserRegisteredEventHandler,
+        AuthenticationService,
+        AuthenticationContextMapper,
         {
             provide: USER_REPOSITORY,
             useClass: PrismaUserRepository,
@@ -52,6 +77,13 @@ import { PrismaVerificationTokenRepository } from './infrastructure/persistence/
             provide: VERIFICATION_TOKEN_REPOSITORY,
             useClass: PrismaVerificationTokenRepository,
         },
+        { provide: SESSION_REPOSITORY, useClass: PrismaSessionRepository },
+        { provide: REFRESH_TOKEN_REPOSITORY, useClass: PrismaRefreshTokenRepository },
+        {
+            provide: AccessTokenGenerator,
+            useClass: JwtTokenGenerator,
+        },
     ],
+    exports: [AccessTokenGenerator, SESSION_REPOSITORY, REFRESH_TOKEN_REPOSITORY],
 })
 export class AuthenticationModule {}

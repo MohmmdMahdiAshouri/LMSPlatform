@@ -6,18 +6,19 @@ enum UserStatus {
 }
 
 model User {
-    id                  String     @id @default(uuid()) @db.Uuid
-    email               String     @unique @db.VarChar(255)
-    username            String     @unique @db.VarChar(50)
-    passwordHash        String     @db.VarChar(255)
-    status              UserStatus @default(ACTIVE)
-    emailVerifiedAt     DateTime?  @db.Timestamptz(6)
+    id                      String              @id @default(uuid()) @db.Uuid
+    email                   String              @unique @db.VarChar(255)
+    username                String              @unique @db.VarChar(50)
+    passwordHash            String              @db.VarChar(255)
+    status                  UserStatus          @default(ACTIVE)
+    emailVerifiedAt         DateTime?           @db.Timestamptz(6)
     emailVerificationTokens VerificationToken[]
-    failedLoginAttempts Int        @default(0)
-    lockedUntil         DateTime?  @db.Timestamptz(6)
-    lastLoginAt         DateTime?  @db.Timestamptz(6)
-    createdAt           DateTime   @default(now()) @db.Timestamptz(6)
-    updatedAt           DateTime   @default(now()) @updatedAt @db.Timestamptz(6)
+    failedLoginAttempts     Int                 @default(0)
+    lockedUntil             DateTime?           @db.Timestamptz(6)
+    lastLoginAt             DateTime?           @db.Timestamptz(6)
+    createdAt               DateTime            @default(now()) @db.Timestamptz(6)
+    updatedAt               DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
+    sessions                Session[]
 
     @@index([username], name: "idx_user_username")
     @@index([email], name: "idx_user_email")

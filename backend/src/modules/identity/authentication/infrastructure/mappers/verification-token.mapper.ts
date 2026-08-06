@@ -3,7 +3,15 @@ import { VerificationToken } from '../../domain/entities/verification-token.enti
 
 export class VerificationTokenMapper {
     static toDomain(prisma: PrismaVerificationToken): VerificationToken {
-        return VerificationToken.create(prisma.userId, prisma.tokenHash, prisma.expiresAt);
+        return VerificationToken.restore(
+            prisma.id,
+            prisma.userId,
+            prisma.tokenHash,
+            prisma.expiresAt,
+            prisma.usedAt,
+            prisma.revokedAt,
+            prisma.createdAt,
+        );
     }
 
     static toPersistence(verificationToken: VerificationToken) {
