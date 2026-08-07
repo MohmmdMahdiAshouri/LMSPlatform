@@ -5,6 +5,8 @@ import { PasswordHash } from '../value-objects/password-hash.vo';
 import { UserStatus } from '../enums/user-status.enum';
 
 export class User {
+    private static readonly MAX_FAILED_LOGIN_ATTEMPTS = 5;
+    private static readonly LOCK_DURATION_MINUTES = 30;
     private constructor(
         private readonly id: string,
         private email: Email,
@@ -73,11 +75,11 @@ export class User {
         this.touch();
     }
 
-    recordFailedLogin(maxAttempts = 5): void {
+    recordFailedLogin(maxAttempts = User.MAX_FAILED_LOGIN_ATTEMPTS): void {
         this.failedLoginAttempts++;
 
         if (this.failedLoginAttempts >= maxAttempts) {
-            this.lockedUntil = new Date(Date.now() + 15 * 60 * 1000);
+            this.lockedUntil = new Date(Date.now() + User.LOCK_DURATION_MINUTES * 60 * 1000);
         }
 
         this.touch();

@@ -10,6 +10,9 @@ import { VerifyEmailDto } from '../dto/verify-email.dto';
 import type { Request as ExpressRequest, Response as ExpressResponse } from 'express';
 import { AuthenticationResult } from '../../application/contracts/authentication-result';
 import { AuthenticationContextMapper } from '../mappers/authentication-context.mapper';
+import { LoginDto } from '../dto/Login.dto';
+import { LoginCommand } from '../../application/commands/login/login.command';
+import { LoginSwagger } from '../swagger/login.swagger';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -44,6 +47,25 @@ export class AuthenticationController {
         const reqContext = this.authenticationContext.formRequest(req);
         const result = await this.commandBus.execute<VerifyEmailCommand, AuthenticationResult>(
             new VerifyEmailCommand(verifyEmailDto.verificationToken, reqContext),
+        );
+        this.authenticationContext.formResponse(res, result.refreshToken);
+        return { accessToken: result.accessToken };
+    }
+
+    @Post('login')
+    @LoginSwagger()
+    @Response({
+        statusCode: HttpStatus.OK,
+        message: 'User logged in successfully',
+    })
+    async login(
+        @Body() loginDto: LoginDto,
+        @Req() req: ExpressRequest,
+        @Res({ passthrough: true }) res: ExpressResponse,
+    ) {
+        const reqContext = this.authenticationContext.formRequest(req);
+        const result = await this.commandBus.execute<LoginCommand, AuthenticationResult>(
+            new LoginCommand(loginDto.emailOrUsername, loginDto.password, reqContext),
         );
         this.authenticationContext.formResponse(res, result.refreshToken);
         return { accessToken: result.accessToken };

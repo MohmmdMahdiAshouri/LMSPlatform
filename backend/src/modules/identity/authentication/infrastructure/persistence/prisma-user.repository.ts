@@ -60,6 +60,18 @@ export class PrismaUserRepository implements UserRepository {
         return UserMapper.toDomain(user);
     }
 
+    async findByLoginIdentifier(identifier: string): Promise<User | null> {
+        const user = await this.txHost.tx.user.findFirst({
+            where: {
+                OR: [{ email: identifier }, { username: identifier }],
+            },
+        });
+
+        if (!user) return null;
+
+        return UserMapper.toDomain(user);
+    }
+
     async existsByEmail(email: Email): Promise<boolean> {
         const count = await this.txHost.tx.user.count({
             where: {

@@ -49,6 +49,6 @@ export class VerifyEmailHandler implements ICommandHandler<VerifyEmailCommand, A
         await this.userRepository.update(user);
         await this.verificationTokenRepository.update(verificationToken);
 
-        return this.authenticationService.create(user, command.context);
+        return this.authenticationService.authenticate(user, command.context);
     }
 }

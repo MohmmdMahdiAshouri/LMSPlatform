@@ -4,6 +4,9 @@ import { SessionMapper } from '../mappers/session.mapper';
 import { Session } from '../../domain/entities/session.entity';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
+import { DeviceType } from '../../domain/enums/session.enum';
+import { SessionStatus } from '@prisma/client';
+import { SessionDeviceTypeMapper } from '../mappers/session-device-type.mapper';
 
 @Injectable()
 export class PrismaSessionRepository implements SessionRepository {
@@ -27,6 +30,30 @@ export class PrismaSessionRepository implements SessionRepository {
     async findById(id: string): Promise<Session | null> {
         const session = await this.txHost.tx.session.findUnique({
             where: { id },
+        });
+
+        if (!session) return null;
+
+        return SessionMapper.toDomain(session);
+    }
+
+    async findActiveByUserAndDevice(
+        userId: string,
+        deviceType: DeviceType,
+        browser: string,
+        operatingSystem: string,
+    ): Promise<Session | null> {
+        const session = await this.txHost.tx.session.findFirst({
+            where: {
+                userId,
+                deviceType: SessionDeviceTypeMapper.toPersistence(deviceType),
+                browser,
+                operatingSystem,
+                status: SessionStatus.ACTIVE,
+                expiresAt: {
+                    gt: new Date(),
+                },
+            },
         });
 
         if (!session) return null;

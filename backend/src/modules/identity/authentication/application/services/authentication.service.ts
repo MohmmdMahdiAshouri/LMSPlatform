@@ -18,6 +18,7 @@ import {
     TOKEN_GENERATOR,
     TOKEN_HASHER,
 } from '../tokens/injection.token';
+import { RefreshTokenNotFoundException } from '../../domain/exceptions/refresh-token-not-found.exception';
 
 export class AuthenticationService {
     private static readonly EXPIRES_IN_DAYS = 15;
@@ -37,7 +38,23 @@ export class AuthenticationService {
     ) {}
 
     @Transactional(Propagation.RequiresNew)
-    async create(user: User, context: AuthenticationContext): Promise<AuthenticationResult> {
+    async authenticate(user: User, context: AuthenticationContext): Promise<AuthenticationResult> {
+        const existingSession = await this.sessionRepository.findActiveByUserAndDevice(
+            user.getId(),
+            context.deviceType,
+            context.browser,
+            context.operatingSystem,
+        );
+
+        if (existingSession) {
+            return this.reuseSession(user, existingSession);
+        }
+
+        return this.createNewSession(user, context);
+    }
+
+    @Transactional(Propagation.RequiresNew)
+    private async createNewSession(user: User, context: AuthenticationContext): Promise<AuthenticationResult> {
         //generate refresh token
         const plainRefreshToken = this.tokenGenerator.generate();
         const hashedRefreshToken = this.tokenHasher.hash(plainRefreshToken);
@@ -62,6 +79,32 @@ export class AuthenticationService {
         await this.refreshTokenRepository.save(refreshToken);
 
         //generate access token
+        const accessToken = await this.accessTokenGenerator.generate(user, session);
+
+        return {
+            accessToken,
+            refreshToken: plainRefreshToken,
+        };
+    }
+
+    @Transactional(Propagation.RequiresNew)
+    private async reuseSession(user: User, session: Session): Promise<AuthenticationResult> {
+        const plainRefreshToken = this.tokenGenerator.generate();
+        const hashedRefreshToken = this.tokenHasher.hash(plainRefreshToken);
+
+        const refreshToken = await this.refreshTokenRepository.findBySessionId(session.getId());
+        if (!refreshToken) {
+            throw new RefreshTokenNotFoundException();
+        }
+
+        const expiresAt = new Date(
+            this.clock.now().getTime() + AuthenticationService.EXPIRES_IN_DAYS * 24 * 60 * 60 * 1000,
+        );
+
+        refreshToken.rotate(hashedRefreshToken, expiresAt);
+
+        await this.refreshTokenRepository.update(refreshToken);
+
         const accessToken = await this.accessTokenGenerator.generate(user, session);
 
         return {

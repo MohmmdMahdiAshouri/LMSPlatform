@@ -1,12 +1,12 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiResponse } from '@nestjs/swagger';
-import { RegisterDto } from '../dto/register.dto';
+import { LoginDto } from '../dto/Login.dto';
 
-export function RegisterSwagger() {
+export function LoginSwagger() {
     return applyDecorators(
         ApiOperation({
-            summary: 'Register a new user',
-            description: 'Creates a new user account and returns successful message.',
+            summary: 'Login a user',
+            description: 'Logining a registered user',
         }),
 
         ApiResponse({
@@ -15,11 +15,11 @@ export function RegisterSwagger() {
         }),
 
         ApiBody({
-            type: RegisterDto,
+            type: LoginDto,
         }),
 
         ApiCreatedResponse({
-            description: 'User registered successfully.',
+            description: 'User logged in successfully.',
         }),
 
         ApiBadRequestResponse({

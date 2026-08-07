@@ -1,4 +1,5 @@
 import { Session } from '../entities/session.entity';
+import { DeviceType } from '../enums/session.enum';
 
 export abstract class SessionRepository {
     abstract save(session: Session, context?: unknown): Promise<void>;
@@ -6,6 +7,13 @@ export abstract class SessionRepository {
     abstract update(session: Session): Promise<void>;
 
     abstract findById(id: string): Promise<Session | null>;
+
+    abstract findActiveByUserAndDevice(
+        userId: string,
+        deviceType: DeviceType,
+        browser: string,
+        operatingSystem: string,
+    ): Promise<Session | null>;
 
     abstract delete(id: string): Promise<void>;
 }
