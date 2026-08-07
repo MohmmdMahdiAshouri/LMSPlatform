@@ -1,16 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PasswordHasher } from '../../application/ports/password-hasher.port';
+import { Password } from '../../domain/value-objects/password.vo';
+import { PasswordHash } from '../../domain/value-objects/password-hash.vo';
 
 @Injectable()
 export class BcryptPasswordHasher implements PasswordHasher {
     private static readonly SALT_ROUNDS = 12;
 
-    hash(password: string): Promise<string> {
-        return bcrypt.hash(password, BcryptPasswordHasher.SALT_ROUNDS);
+    hash(password: Password): Promise<string> {
+        return bcrypt.hash(password.getValue(), BcryptPasswordHasher.SALT_ROUNDS);
     }
 
-    compare(plain: string, hashed: string): Promise<boolean> {
-        return bcrypt.compare(plain, hashed);
+    compare(plain: Password, hashed: PasswordHash): Promise<boolean> {
+        return bcrypt.compare(plain.getValue(), hashed.getValue());
     }
 }

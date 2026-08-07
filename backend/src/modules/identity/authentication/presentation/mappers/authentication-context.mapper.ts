@@ -23,11 +23,11 @@ export class AuthenticationContextMapper {
     }
 
     formResponse(res: Response, refreshToken: string) {
-        res.cookie('refreshToken', refreshToken, {
+        return res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            secure: true,
+            secure: process.env.NODE_ENV === 'development' ? false : true,
             sameSite: 'strict',
-            path: '/api/auth/refresh-token',
+            path: '/',
         });
     }
 }

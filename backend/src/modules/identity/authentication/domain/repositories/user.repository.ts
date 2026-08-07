@@ -13,6 +13,8 @@ export abstract class UserRepository {
 
     abstract findByUsername(username: Username): Promise<User | null>;
 
+    abstract findByLoginIdentifier(identifier: string): Promise<User | null>;
+
     abstract existsByEmail(email: Email): Promise<boolean>;
 
     abstract existsByUsername(username: Username): Promise<boolean>;
