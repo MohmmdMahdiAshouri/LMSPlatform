@@ -49,7 +49,7 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
             throw new UsernameAlreadyExistsException(username);
         }
 
-        const hash = await this.passwordHasher.hash(password.getValue());
+        const hash = await this.passwordHasher.hash(password);
 
         const user = User.register(email, username, PasswordHash.create(hash));
 

@@ -29,6 +29,7 @@ import { PrismaRefreshTokenRepository } from './infrastructure/persistence/prism
 import { VerifyEmailHandler } from './application/commands/verify-email/verify-email.handler';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthenticationContextMapper } from './presentation/mappers/authentication-context.mapper';
+import { LoginHandler } from './application/commands/login/login.handler';
 @Module({
     imports: [
         CqrsModule,
@@ -51,6 +52,7 @@ import { AuthenticationContextMapper } from './presentation/mappers/authenticati
         UserRegisteredEventHandler,
         AuthenticationService,
         AuthenticationContextMapper,
+        LoginHandler,
         {
             provide: USER_REPOSITORY,
             useClass: PrismaUserRepository,
