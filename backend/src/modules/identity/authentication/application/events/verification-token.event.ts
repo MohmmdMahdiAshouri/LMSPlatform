@@ -1,4 +1,4 @@
-export class UserRegisteredEvent {
+export class VerificationTokenEvent {
     constructor(
         public readonly userId: string,
         public readonly email: string,

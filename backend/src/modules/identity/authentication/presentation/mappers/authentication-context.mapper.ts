@@ -28,6 +28,7 @@ export class AuthenticationContextMapper {
             secure: process.env.NODE_ENV === 'development' ? false : true,
             sameSite: 'strict',
             path: '/',
+            maxAge: 1000 * 60 * 60 * 24 * 15,
         });
     }
 }

@@ -13,6 +13,9 @@ import { AuthenticationContextMapper } from '../mappers/authentication-context.m
 import { LoginDto } from '../dto/Login.dto';
 import { LoginCommand } from '../../application/commands/login/login.command';
 import { LoginSwagger } from '../swagger/login.swagger';
+import { ResendVerificationTokenDto } from '../dto/resend-verification-token.dto';
+import { ResendVerificationTokenCommand } from '../../application/commands/verify-email/resend-verification-token.command';
+import { ResendVerificationTokenSwagger } from '../swagger/resend-verification-token.swagger';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -25,7 +28,7 @@ export class AuthenticationController {
     @RegisterSwagger()
     @Response({
         statusCode: HttpStatus.CREATED,
-        message: 'User registered successfully',
+        message: 'User registered successfully.',
     })
     register(@Body() registerDto: RegisterDto) {
         return this.commandBus.execute(
@@ -69,5 +72,17 @@ export class AuthenticationController {
         );
         this.authenticationContext.formResponse(res, result.refreshToken);
         return { accessToken: result.accessToken };
+    }
+
+    @Post('resend-verification-token')
+    @ResendVerificationTokenSwagger()
+    @Response({
+        statusCode: HttpStatus.OK,
+        message: 'Verification token sent successfully',
+    })
+    resendVerification(@Body() resendVerificationDto: ResendVerificationTokenDto) {
+        return this.commandBus.execute(
+            new ResendVerificationTokenCommand(resendVerificationDto.email, resendVerificationDto.username),
+        );
     }
 }

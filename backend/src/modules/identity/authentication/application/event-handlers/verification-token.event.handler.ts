@@ -1,13 +1,13 @@
 import { EventsHandler } from '@nestjs/cqrs';
 import { IEventHandler } from '@nestjs/cqrs';
-import { UserRegisteredEvent } from '../events/user-registered.event';
+import { VerificationTokenEvent } from '../events/verification-token.event';
 import { EmailProducer } from '../producers/email.producer';
 
-@EventsHandler(UserRegisteredEvent)
-export class UserRegisteredEventHandler implements IEventHandler<UserRegisteredEvent> {
+@EventsHandler(VerificationTokenEvent)
+export class UserRegisteredEventHandler implements IEventHandler<VerificationTokenEvent> {
     constructor(private readonly emailProducer: EmailProducer) {}
 
-    async handle(event: UserRegisteredEvent): Promise<void> {
+    async handle(event: VerificationTokenEvent): Promise<void> {
         await this.emailProducer.sendVerificationEmail(event.email, event.username, event.verificationToken);
     }
 }

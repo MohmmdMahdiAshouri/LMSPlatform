@@ -1,4 +1,4 @@
-import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import type { UserRepository } from '@modules/identity/authentication/domain/repositories/user.repository';
 import { User } from '@modules/identity/authentication/domain/entities/user.entity';
@@ -6,32 +6,24 @@ import { UsernameAlreadyExistsException } from '@modules/identity/authentication
 import { EmailAlreadyExistsException } from '@modules/identity/authentication/domain/exceptions/email-already-exists.exception';
 import { RegisterCommand } from './register.command';
 import type { PasswordHasher } from '../../ports/password-hasher.port';
-import { PASSWORD_HASHER, USER_REPOSITORY, VERIFICATION_TOKEN_REPOSITORY } from '../../tokens/injection.token';
+import { PASSWORD_HASHER, USER_REPOSITORY } from '../../tokens/injection.token';
 import { Email } from '@modules/identity/authentication/domain/value-objects/email.vo';
 import { Username } from '@modules/identity/authentication/domain/value-objects/username.vo';
 import { Password } from '@modules/identity/authentication/domain/value-objects/password.vo';
 import { PasswordHash } from '@modules/identity/authentication/domain/value-objects/password-hash.vo';
-import { VerificationTokenFactory } from '../../factories/verification-token.factory';
-import { VerificationTokenRepository } from '@modules/identity/authentication/domain/repositories/verification-token.repository';
-import { UserRegisteredEvent } from '../../events/user-registered.event';
-
+import { VerificationTokenService } from '../../services/verification-token.service';
 @CommandHandler(RegisterCommand)
 export class RegisterHandler implements ICommandHandler<RegisterCommand> {
     constructor(
         @Inject(USER_REPOSITORY)
         private readonly userRepository: UserRepository,
 
-        @Inject(VERIFICATION_TOKEN_REPOSITORY)
-        private readonly verificationTokenRepository: VerificationTokenRepository,
-
         @Inject(PASSWORD_HASHER)
         private readonly passwordHasher: PasswordHasher,
 
-        private readonly verificationTokenFactory: VerificationTokenFactory,
-
-        private readonly eventBus: EventBus,
+        private readonly verificationTokenService: VerificationTokenService,
     ) {}
-    async execute(command: RegisterCommand): Promise<void> {
+    async execute(command: RegisterCommand): Promise<{ email: string; username: string }> {
         //user registration logic
         const email = Email.create(command.email);
         const username = Username.create(command.username);
@@ -55,18 +47,9 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
 
         await this.userRepository.save(user);
 
-        // Create a verification token for the user
-        const result = this.verificationTokenFactory.create(user.getId());
+        // Create and send a verification token for the user
+        await this.verificationTokenService.create(user);
 
-        await this.verificationTokenRepository.save(result.verificationToken);
-
-        this.eventBus.publish(
-            new UserRegisteredEvent(
-                user.getId(),
-                user.getEmail().getValue(),
-                user.getUsername().getValue(),
-                result.plainToken,
-            ),
-        );
+        return { email: email.getValue(), username: username.getValue() };
     }
 }
