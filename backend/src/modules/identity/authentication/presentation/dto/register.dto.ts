@@ -3,6 +3,7 @@ import { IsEmail, IsNotEmpty, IsString, MaxLength, MinLength } from 'class-valid
 
 export class RegisterDto {
     @ApiProperty({ example: 'mohmmad@example.com' })
+    @IsNotEmpty()
     @IsEmail({}, { message: 'Invalid email address' })
     readonly email!: string;
 
@@ -20,6 +21,7 @@ export class RegisterDto {
         description:
             'Password must be at least 8 characters long and no more than 64 characters long.It must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.',
     })
+    @IsNotEmpty()
     @IsString()
     @MinLength(8, { message: 'Password must be at least 8 characters long' })
     @MaxLength(64, { message: 'Password must be lower than 64 characters long' })
