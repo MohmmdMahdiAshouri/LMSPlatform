@@ -15,7 +15,7 @@ import { LoginCommand } from '../../application/commands/login/login.command';
 import { LoginSwagger } from '../swagger/login.swagger';
 import { ResendVerificationTokenDto } from '../dto/resend-verification-token.dto';
 import { ResendVerificationTokenCommand } from '../../application/commands/verify-email/resend-verification-token.command';
-import { ResendVerificationToken } from '../swagger/resend-verification-token.swagger';
+import { ResendVerificationTokenSwagger } from '../swagger/resend-verification-token.swagger';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -28,7 +28,7 @@ export class AuthenticationController {
     @RegisterSwagger()
     @Response({
         statusCode: HttpStatus.CREATED,
-        message: 'User registered successfully',
+        message: 'User registered successfully.',
     })
     register(@Body() registerDto: RegisterDto) {
         return this.commandBus.execute(
@@ -75,7 +75,7 @@ export class AuthenticationController {
     }
 
     @Post('resend-verification-token')
-    @ResendVerificationToken()
+    @ResendVerificationTokenSwagger()
     @Response({
         statusCode: HttpStatus.OK,
         message: 'Verification token sent successfully',

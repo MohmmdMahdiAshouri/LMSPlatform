@@ -1,7 +1,7 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiOperation, ApiBadRequestResponse, ApiResponse, ApiOkResponse } from '@nestjs/swagger';
 
-export function ResendVerificationToken() {
+export function ResendVerificationTokenSwagger() {
     return applyDecorators(
         ApiOperation({
             summary: 'Resend verification email token',

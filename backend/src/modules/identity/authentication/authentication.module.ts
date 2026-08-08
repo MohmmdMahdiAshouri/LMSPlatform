@@ -14,8 +14,8 @@ import {
 } from './application/tokens/injection.token';
 import { RegisterHandler } from './application/commands/register/register.handler';
 import { BcryptPasswordHasher } from './infrastructure/security/bcrypt-password-hasher';
-import { UserRegisteredEventHandler } from './application/event-handlers/user-registered.handler';
-import { VerificationTokenFactory } from './application/factories/verification-token.factory';
+import { UserRegisteredEventHandler } from './application/event-handlers/verification-token.event.handler';
+import { VerificationTokenService } from './application/services/verification-token.service';
 import { SystemClock } from './infrastructure/security/system-clock';
 import { Sha256TokenHasher } from './infrastructure/security/sha256-token-hasher';
 import { CryptoTokenGenerator } from './infrastructure/security/crypto-token-generator';
@@ -30,6 +30,7 @@ import { VerifyEmailHandler } from './application/commands/verify-email/verify-e
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthenticationContextMapper } from './presentation/mappers/authentication-context.mapper';
 import { LoginHandler } from './application/commands/login/login.handler';
+import { ResendVerificationTokenHandler } from './application/commands/verify-email/resend-verification-token.handler';
 @Module({
     imports: [
         CqrsModule,
@@ -48,11 +49,12 @@ import { LoginHandler } from './application/commands/login/login.handler';
     providers: [
         RegisterHandler,
         VerifyEmailHandler,
-        VerificationTokenFactory,
+        VerificationTokenService,
         UserRegisteredEventHandler,
         AuthenticationService,
         AuthenticationContextMapper,
         LoginHandler,
+        ResendVerificationTokenHandler,
         {
             provide: USER_REPOSITORY,
             useClass: PrismaUserRepository,

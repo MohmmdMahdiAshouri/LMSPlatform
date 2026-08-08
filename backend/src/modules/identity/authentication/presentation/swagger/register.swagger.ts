@@ -6,7 +6,7 @@ export function RegisterSwagger() {
     return applyDecorators(
         ApiOperation({
             summary: 'Register a new user',
-            description: 'Creates a new user account and returns successful message.',
+            description: 'Creates a new user account and returns email, username and successful message.',
         }),
 
         ApiResponse({
@@ -19,7 +19,7 @@ export function RegisterSwagger() {
         }),
 
         ApiCreatedResponse({
-            description: 'User registered successfully.',
+            description: 'User registered successfully then save email, username in local storage.',
         }),
 
         ApiBadRequestResponse({
