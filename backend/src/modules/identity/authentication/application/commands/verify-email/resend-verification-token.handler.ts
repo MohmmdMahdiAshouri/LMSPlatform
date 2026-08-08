@@ -8,6 +8,7 @@ import { VerificationTokenRepository } from '@modules/identity/authentication/do
 import { VerificationTokenService } from '../../services/verification-token.service';
 import { UserNotFoundException } from '@modules/identity/authentication/domain/exceptions/user-not-found.exception';
 import { VerificationTokenResendTooSoonException } from '@modules/identity/authentication/domain/exceptions/verification-token-resend-too-soon.Exception';
+import { EmailAlreadyVerifiedException } from '@modules/identity/authentication/domain/exceptions/email-already-verified.exception';
 
 @CommandHandler(ResendVerificationTokenCommand)
 export class ResendVerificationTokenHandler implements ICommandHandler<ResendVerificationTokenCommand> {
@@ -24,6 +25,9 @@ export class ResendVerificationTokenHandler implements ICommandHandler<ResendVer
         const user = await this.userRepository.findByEmail(email);
         if (!user) {
             throw new UserNotFoundException();
+        }
+        if (user.isEmailVerified()) {
+            throw new EmailAlreadyVerifiedException(user.getEmail());
         }
         const oldVerificationToken = await this.verificationTokenRepository.findActiveByUserId(user.getId());
 
