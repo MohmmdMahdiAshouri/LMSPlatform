@@ -12,6 +12,11 @@ import { PrismaModule } from '@shared/prisma/prisma.module';
 import { QueueModule } from '@shared/queue/queue.module';
 import { ResponseInterceptor } from '@shared/response-handling/interceptors/response.interceptors';
 import { PrismaService } from '@shared/prisma/prisma.service';
+import { OUTBOX_REPOSITORY } from '@shared/common/domain/injection.token';
+import { PrismaOutboxRepository } from '@shared/common/infrastructure/prisma-outbox-message.repository';
+import { ScheduleModule } from '@nestjs/schedule';
+import { OutboxProcessorService } from '@shared/common/infrastructure/outbox-processor.service';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
     imports: [
@@ -21,6 +26,8 @@ import { PrismaService } from '@shared/prisma/prisma.service';
             cache: true,
             expandVariables: true,
         }),
+        ScheduleModule.forRoot(),
+        CqrsModule,
         ClsModule.forRoot({
             middleware: { mount: true },
             plugins: [
@@ -38,6 +45,7 @@ import { PrismaService } from '@shared/prisma/prisma.service';
         AuthenticationModule,
     ],
     providers: [
+        OutboxProcessorService,
         { provide: APP_FILTER, useClass: GlobalExceptionFilter },
         {
             provide: APP_INTERCEPTOR,
@@ -46,6 +54,10 @@ import { PrismaService } from '@shared/prisma/prisma.service';
         {
             provide: APP_PIPE,
             useClass: AppValidationPipe,
+        },
+        {
+            provide: OUTBOX_REPOSITORY,
+            useClass: PrismaOutboxRepository,
         },
     ],
 })

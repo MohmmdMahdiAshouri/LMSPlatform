@@ -9,6 +9,7 @@ import { VerificationTokenService } from '../../services/verification-token.serv
 import { UserNotFoundException } from '@modules/identity/authentication/domain/exceptions/user-not-found.exception';
 import { VerificationTokenResendTooSoonException } from '@modules/identity/authentication/domain/exceptions/verification-token-resend-too-soon.Exception';
 import { EmailAlreadyVerifiedException } from '@modules/identity/authentication/domain/exceptions/email-already-verified.exception';
+import { Transactional } from '@nestjs-cls/transactional';
 
 @CommandHandler(ResendVerificationTokenCommand)
 export class ResendVerificationTokenHandler implements ICommandHandler<ResendVerificationTokenCommand> {
@@ -20,6 +21,7 @@ export class ResendVerificationTokenHandler implements ICommandHandler<ResendVer
 
         private readonly verificationTokenService: VerificationTokenService,
     ) {}
+    @Transactional()
     async execute(command: ResendVerificationTokenCommand): Promise<any> {
         const email = Email.create(command.email);
         const user = await this.userRepository.findByEmail(email);

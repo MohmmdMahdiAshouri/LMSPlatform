@@ -12,6 +12,7 @@ import { Username } from '@modules/identity/authentication/domain/value-objects/
 import { Password } from '@modules/identity/authentication/domain/value-objects/password.vo';
 import { PasswordHash } from '@modules/identity/authentication/domain/value-objects/password-hash.vo';
 import { VerificationTokenService } from '../../services/verification-token.service';
+import { Transactional } from '@nestjs-cls/transactional';
 @CommandHandler(RegisterCommand)
 export class RegisterHandler implements ICommandHandler<RegisterCommand> {
     constructor(
@@ -23,6 +24,7 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
 
         private readonly verificationTokenService: VerificationTokenService,
     ) {}
+    @Transactional()
     async execute(command: RegisterCommand): Promise<{ email: string; username: string }> {
         //user registration logic
         const email = Email.create(command.email);
