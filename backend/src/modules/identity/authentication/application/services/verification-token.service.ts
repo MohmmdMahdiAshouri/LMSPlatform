@@ -21,9 +21,9 @@ export class VerificationTokenService {
     ) {}
 
     async create(user: User) {
-        const result = this.tokenGeneratorFactory.create();
+        const { tokenHash, plainToken, expiresAt } = this.tokenGeneratorFactory.create();
 
-        const verificationToken = VerificationToken.create(user.getId(), result.tokenHash, result.expiresAt);
+        const verificationToken = VerificationToken.create(user.getId(), tokenHash, expiresAt);
 
         await this.verificationTokenRepository.save(verificationToken);
 
@@ -31,7 +31,7 @@ export class VerificationTokenService {
             userId: user.getId(),
             email: user.getEmail().getValue(),
             username: user.getUsername().getValue(),
-            verificationToken: result.plainToken,
+            verificationToken: plainToken,
         });
         await this.outboxRepository.save(outboxMessage);
     }

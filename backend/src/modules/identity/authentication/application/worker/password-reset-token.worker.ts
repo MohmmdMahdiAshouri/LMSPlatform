@@ -1,14 +1,14 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { EMAIL_QUEUE } from '@shared/queue/queue.constants';
-import { VerifyEmailTemplate } from '../../templates/verify-email.template';
 import { EmailSender } from '@shared/email/smtp-sender.port';
-import { SendVerificationEmailJob } from '../jobs/send-email-verification.job';
 import { Inject } from '@nestjs/common';
 import { EMAIL_SENDER } from '@shared/email/injection.token';
+import { PasswordResetEmailTemplate } from '../../templates/password-reset-email.template';
+import { SendPasswordResetEmailJob } from '../jobs/send-email-password-reset.job';
 
 @Processor(EMAIL_QUEUE)
-export class VerificationEmailWorker extends WorkerHost {
+export class PasswordResetEmailWorker extends WorkerHost {
     constructor(
         @Inject(EMAIL_SENDER)
         private readonly emailSender: EmailSender,
@@ -16,14 +16,14 @@ export class VerificationEmailWorker extends WorkerHost {
         super();
     }
 
-    async process(job: Job<SendVerificationEmailJob>): Promise<void> {
+    async process(job: Job<SendPasswordResetEmailJob>): Promise<void> {
         switch (job.name) {
-            case 'send-verification-email': {
-                const { email, username, verificationToken } = job.data;
-                const emailContent = VerifyEmailTemplate.generate(username, verificationToken);
+            case 'send-password-reset-email': {
+                const { email, passwordResetToken } = job.data;
+                const emailContent = PasswordResetEmailTemplate.generate(passwordResetToken);
                 await this.emailSender.send({
                     to: email,
-                    subject: 'Welcome!',
+                    subject: 'Reset Password!',
                     html: emailContent,
                 });
                 break;

@@ -32,4 +32,26 @@ export class EmailProducer {
             },
         );
     }
+
+    async sendPasswordResetEmail(email: string, passwordResetToken: string) {
+        await this.emailQueue.add(
+            'send-password-reset-email',
+            {
+                email,
+                passwordResetToken,
+            },
+            {
+                attempts: 3,
+
+                backoff: {
+                    type: 'exponential',
+                    delay: 3000,
+                },
+
+                removeOnComplete: 100,
+
+                removeOnFail: 100,
+            },
+        );
+    }
 }

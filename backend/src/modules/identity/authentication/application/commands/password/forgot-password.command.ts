@@ -1,3 +1,3 @@
-export class ResendVerificationTokenCommand {
+export class ForgotPasswordCommand {
     constructor(public readonly email: string) {}
 }
