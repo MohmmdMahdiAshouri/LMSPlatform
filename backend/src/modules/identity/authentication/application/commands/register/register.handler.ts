@@ -13,6 +13,8 @@ import { Password } from '@modules/identity/authentication/domain/value-objects/
 import { PasswordHash } from '@modules/identity/authentication/domain/value-objects/password-hash.vo';
 import { VerificationTokenService } from '../../services/verification-token.service';
 import { Transactional } from '@nestjs-cls/transactional';
+import { AuthenticationService } from '../../services/authentication.service';
+import { AuthenticationResult } from '../../contracts/authentication-result';
 @CommandHandler(RegisterCommand)
 export class RegisterHandler implements ICommandHandler<RegisterCommand> {
     constructor(
@@ -23,35 +25,34 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
         private readonly passwordHasher: PasswordHasher,
 
         private readonly verificationTokenService: VerificationTokenService,
+
+        private readonly authenticationService: AuthenticationService,
     ) {}
+    async execute(command: RegisterCommand): Promise<AuthenticationResult> {
+        const user = await this.registerUser(command);
+
+        // Create session and refresh token
+        return this.authenticationService.authenticate(user, command.context);
+    }
+
     @Transactional()
-    async execute(command: RegisterCommand): Promise<{ email: string; username: string }> {
-        //user registration logic
+    private async registerUser(command: RegisterCommand): Promise<User> {
         const email = Email.create(command.email);
         const username = Username.create(command.username);
         const password = Password.create(command.password);
 
         const emailExists = await this.userRepository.existsByEmail(email);
-
-        if (emailExists) {
-            throw new EmailAlreadyExistsException(email);
-        }
+        if (emailExists) throw new EmailAlreadyExistsException(email);
 
         const usernameExists = await this.userRepository.existsByUsername(username);
-
-        if (usernameExists) {
-            throw new UsernameAlreadyExistsException(username);
-        }
+        if (usernameExists) throw new UsernameAlreadyExistsException(username);
 
         const hash = await this.passwordHasher.hash(password);
-
         const user = User.register(email, username, PasswordHash.create(hash));
 
         await this.userRepository.save(user);
-
-        // Create and send a verification token for the user
         await this.verificationTokenService.create(user);
 
-        return { email: email.getValue(), username: username.getValue() };
+        return user;
     }
 }

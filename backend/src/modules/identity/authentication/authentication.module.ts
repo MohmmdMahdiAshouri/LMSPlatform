@@ -5,6 +5,7 @@ import { PrismaUserRepository } from './infrastructure/persistence/prisma-user.r
 import {
     CLOCK,
     PASSWORD_HASHER,
+    PASSWORD_RESET_TOKEN_REPOSITORY,
     REFRESH_TOKEN_REPOSITORY,
     SESSION_REPOSITORY,
     TOKEN_GENERATOR,
@@ -15,6 +16,7 @@ import {
 import { RegisterHandler } from './application/commands/register/register.handler';
 import { BcryptPasswordHasher } from './infrastructure/security/bcrypt-password-hasher';
 import { UserRegisteredEventHandler } from './application/event-handlers/verification-token.event.handler';
+import { TokenGeneratorFactory } from './application/factories/token-generator.factory';
 import { VerificationTokenService } from './application/services/verification-token.service';
 import { SystemClock } from './infrastructure/security/system-clock';
 import { Sha256TokenHasher } from './infrastructure/security/sha256-token-hasher';
@@ -31,6 +33,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthenticationContextMapper } from './presentation/mappers/authentication-context.mapper';
 import { LoginHandler } from './application/commands/login/login.handler';
 import { ResendVerificationTokenHandler } from './application/commands/verify-email/resend-verification-token.handler';
+import { VerificationController } from './presentation/controllers/verification.controller';
+import { PrismaPasswordResetTokenRepository } from './infrastructure/persistence/prisma-password-reset-token.repository';
+import { PasswordController } from './presentation/controllers/password.controller';
+import { ForgotPasswordHandler } from './application/commands/password/forgot-password.handler';
+import { OUTBOX_REPOSITORY } from '@shared/common/domain/injection.token';
+import { PrismaOutboxRepository } from '@shared/common/infrastructure/prisma-outbox-message.repository';
 @Module({
     imports: [
         CqrsModule,
@@ -45,16 +53,18 @@ import { ResendVerificationTokenHandler } from './application/commands/verify-em
             }),
         }),
     ],
-    controllers: [AuthenticationController],
+    controllers: [AuthenticationController, VerificationController, PasswordController],
     providers: [
         RegisterHandler,
         VerifyEmailHandler,
+        TokenGeneratorFactory,
         VerificationTokenService,
         UserRegisteredEventHandler,
         AuthenticationService,
         AuthenticationContextMapper,
         LoginHandler,
         ResendVerificationTokenHandler,
+        ForgotPasswordHandler,
         {
             provide: USER_REPOSITORY,
             useClass: PrismaUserRepository,
@@ -81,11 +91,19 @@ import { ResendVerificationTokenHandler } from './application/commands/verify-em
             provide: VERIFICATION_TOKEN_REPOSITORY,
             useClass: PrismaVerificationTokenRepository,
         },
+        {
+            provide: PASSWORD_RESET_TOKEN_REPOSITORY,
+            useClass: PrismaPasswordResetTokenRepository,
+        },
         { provide: SESSION_REPOSITORY, useClass: PrismaSessionRepository },
         { provide: REFRESH_TOKEN_REPOSITORY, useClass: PrismaRefreshTokenRepository },
         {
             provide: AccessTokenGenerator,
             useClass: JwtTokenGenerator,
+        },
+        {
+            provide: OUTBOX_REPOSITORY,
+            useClass: PrismaOutboxRepository,
         },
     ],
     exports: [AccessTokenGenerator, SESSION_REPOSITORY, REFRESH_TOKEN_REPOSITORY],

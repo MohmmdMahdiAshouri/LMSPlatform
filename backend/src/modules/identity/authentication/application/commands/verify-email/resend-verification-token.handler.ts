@@ -7,7 +7,7 @@ import { Email } from '@modules/identity/authentication/domain/value-objects/ema
 import { VerificationTokenRepository } from '@modules/identity/authentication/domain/repositories/verification-token.repository';
 import { VerificationTokenService } from '../../services/verification-token.service';
 import { UserNotFoundException } from '@modules/identity/authentication/domain/exceptions/user-not-found.exception';
-import { VerificationTokenResendTooSoonException } from '@modules/identity/authentication/domain/exceptions/verification-token-resend-too-soon.Exception';
+import { VerificationTokenResendTooSoonException } from '@modules/identity/authentication/domain/exceptions/verification-token-resend-too-soon.exception';
 import { EmailAlreadyVerifiedException } from '@modules/identity/authentication/domain/exceptions/email-already-verified.exception';
 import { Transactional } from '@nestjs-cls/transactional';
 

@@ -12,13 +12,14 @@ model User {
     passwordHash            String              @db.VarChar(255)
     status                  UserStatus          @default(ACTIVE)
     emailVerifiedAt         DateTime?           @db.Timestamptz(6)
-    emailVerificationTokens VerificationToken[]
     failedLoginAttempts     Int                 @default(0)
     lockedUntil             DateTime?           @db.Timestamptz(6)
     lastLoginAt             DateTime?           @db.Timestamptz(6)
     createdAt               DateTime            @default(now()) @db.Timestamptz(6)
     updatedAt               DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
+    emailVerificationTokens VerificationToken[]
     sessions                Session[]
+    passwordResetTokens     PasswordResetToken[]
 
     @@index([username], name: "idx_user_username")
     @@index([email], name: "idx_user_email")

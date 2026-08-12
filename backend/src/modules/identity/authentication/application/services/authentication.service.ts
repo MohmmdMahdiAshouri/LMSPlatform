@@ -1,4 +1,3 @@
-import { Propagation, Transactional } from '@nestjs-cls/transactional';
 import { RefreshToken } from '../../domain/entities/refresh-token.entity';
 import { Session } from '../../domain/entities/session.entity';
 import { User } from '../../domain/entities/user.entity';
@@ -19,6 +18,7 @@ import {
     TOKEN_HASHER,
 } from '../tokens/injection.token';
 import { RefreshTokenNotFoundException } from '../../domain/exceptions/refresh-token-not-found.exception';
+import { Transactional } from '@nestjs-cls/transactional';
 
 export class AuthenticationService {
     private static readonly EXPIRES_IN_DAYS = 15;
@@ -37,7 +37,7 @@ export class AuthenticationService {
         private readonly clock: Clock,
     ) {}
 
-    @Transactional(Propagation.RequiresNew)
+    @Transactional()
     async authenticate(user: User, context: AuthenticationContext): Promise<AuthenticationResult> {
         const existingSession = await this.sessionRepository.findActiveByUserAndDevice(
             user.getId(),
@@ -53,7 +53,6 @@ export class AuthenticationService {
         return this.createNewSession(user, context);
     }
 
-    @Transactional(Propagation.RequiresNew)
     private async createNewSession(user: User, context: AuthenticationContext): Promise<AuthenticationResult> {
         //generate refresh token
         const plainRefreshToken = this.tokenGenerator.generate();
@@ -87,7 +86,6 @@ export class AuthenticationService {
         };
     }
 
-    @Transactional(Propagation.RequiresNew)
     private async reuseSession(user: User, session: Session): Promise<AuthenticationResult> {
         const plainRefreshToken = this.tokenGenerator.generate();
         const hashedRefreshToken = this.tokenHasher.hash(plainRefreshToken);
