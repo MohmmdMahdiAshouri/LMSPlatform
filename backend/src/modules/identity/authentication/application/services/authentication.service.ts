@@ -110,4 +110,23 @@ export class AuthenticationService {
             refreshToken: plainRefreshToken,
         };
     }
+
+    @Transactional()
+    async revokeAllSessions(userId: string): Promise<void> {
+        const sessions = await this.sessionRepository.findAllByUserId(userId);
+
+        for (const session of sessions) {
+            session.revoke();
+            await this.sessionRepository.update(session);
+
+            const refreshToken = await this.refreshTokenRepository.findBySessionId(session.getId());
+
+            if (!refreshToken) {
+                throw new RefreshTokenNotFoundException();
+            }
+
+            refreshToken.revoke();
+            await this.refreshTokenRepository.update(refreshToken);
+        }
+    }
 }

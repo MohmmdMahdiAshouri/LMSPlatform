@@ -39,6 +39,7 @@ import { PasswordController } from './presentation/controllers/password.controll
 import { ForgotPasswordHandler } from './application/commands/password/forgot-password.handler';
 import { OUTBOX_REPOSITORY } from '@shared/common/domain/injection.token';
 import { PrismaOutboxRepository } from '@shared/common/infrastructure/prisma-outbox-message.repository';
+import { ResetPasswordHandler } from './application/commands/password/reset-password.handler';
 @Module({
     imports: [
         CqrsModule,
@@ -65,6 +66,7 @@ import { PrismaOutboxRepository } from '@shared/common/infrastructure/prisma-out
         LoginHandler,
         ResendVerificationTokenHandler,
         ForgotPasswordHandler,
+        ResetPasswordHandler,
         {
             provide: USER_REPOSITORY,
             useClass: PrismaUserRepository,
