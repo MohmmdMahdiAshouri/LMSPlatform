@@ -61,9 +61,16 @@ export class PrismaSessionRepository implements SessionRepository {
         return SessionMapper.toDomain(session);
     }
 
-    async findAllByUserId(userId: string): Promise<Session[]> {
+    async findAllActiveByUserId(userId: string): Promise<Session[]> {
         const sessions = await this.txHost.tx.session.findMany({
-            where: { userId },
+            where: {
+                userId,
+                status: SessionStatus.ACTIVE,
+                revokedAt: null,
+                expiresAt: {
+                    gt: new Date(),
+                },
+            },
         });
         return sessions.map((session) => SessionMapper.toDomain(session));
     }
