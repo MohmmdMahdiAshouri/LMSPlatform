@@ -1,6 +1,5 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiOperation, ApiBadRequestResponse, ApiResponse, ApiOkResponse, ApiBody } from '@nestjs/swagger';
-import { ResendVerificationTokenDto } from '../dto/resend-verification-token.dto';
+import { ApiOperation, ApiBadRequestResponse, ApiResponse, ApiOkResponse } from '@nestjs/swagger';
 
 export function ResendVerificationTokenSwagger() {
     return applyDecorators(
@@ -12,10 +11,6 @@ export function ResendVerificationTokenSwagger() {
         ApiResponse({
             status: 422,
             description: 'Business validation failed.',
-        }),
-
-        ApiBody({
-            type: ResendVerificationTokenDto,
         }),
 
         ApiOkResponse({
