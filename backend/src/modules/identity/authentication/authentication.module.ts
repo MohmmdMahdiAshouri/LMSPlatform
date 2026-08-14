@@ -45,6 +45,7 @@ import { JwtAuthGuard } from './presentation/guards/jwt-auth-guard';
 import { APP_GUARD } from '@nestjs/core';
 import { PassportModule } from '@nestjs/passport';
 import { CachedSessionRepository } from './infrastructure/persistence/chached-session.repository';
+import { ChangePasswordHandler } from './application/commands/password/change-password.handler';
 @Module({
     imports: [
         CqrsModule,
@@ -76,6 +77,7 @@ import { CachedSessionRepository } from './infrastructure/persistence/chached-se
         JwtStrategy,
         JwtAuthGuard,
         PrismaSessionRepository,
+        ChangePasswordHandler,
         {
             provide: USER_REPOSITORY,
             useClass: PrismaUserRepository,

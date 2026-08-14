@@ -47,7 +47,12 @@ export class PasswordController {
     })
     changePassword(@CurrentUser() user: AuthenticatedUser, @Body() changePasswordDto: ChangePasswordDto) {
         return this.commandBus.execute(
-            new ChangePasswordCommand(user.userId, changePasswordDto.oldPassword, changePasswordDto.newPassword),
+            new ChangePasswordCommand(
+                user.userId,
+                user.sessionId,
+                changePasswordDto.currentPassword,
+                changePasswordDto.newPassword,
+            ),
         );
     }
 }

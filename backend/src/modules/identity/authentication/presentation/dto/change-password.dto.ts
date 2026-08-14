@@ -10,7 +10,7 @@ export class ChangePasswordDto {
     @IsString()
     @MinLength(8, { message: 'Password must be at least 8 characters long' })
     @MaxLength(64, { message: 'Password must be lower than 64 characters long' })
-    readonly oldPassword!: string;
+    readonly currentPassword!: string;
 
     @ApiProperty({
         example: 'Password123!',

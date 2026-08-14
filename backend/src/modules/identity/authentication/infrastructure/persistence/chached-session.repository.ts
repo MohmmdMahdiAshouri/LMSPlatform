@@ -57,8 +57,8 @@ export class CachedSessionRepository implements SessionRepository {
         return this.prismaSessionRepository.findActiveByUserAndDevice(userId, deviceType, browser, operatingSystem);
     }
 
-    async findAllByUserId(userId: string): Promise<Session[]> {
-        return this.prismaSessionRepository.findAllByUserId(userId);
+    async findAllActiveByUserId(userId: string): Promise<Session[]> {
+        return this.prismaSessionRepository.findAllActiveByUserId(userId);
     }
 
     private serialize(session: Session): string {
