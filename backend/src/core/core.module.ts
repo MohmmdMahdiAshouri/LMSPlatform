@@ -17,6 +17,7 @@ import { PrismaOutboxRepository } from '@shared/common/infrastructure/prisma-out
 import { ScheduleModule } from '@nestjs/schedule';
 import { OutboxProcessorService } from '@shared/common/infrastructure/outbox-processor.service';
 import { CqrsModule } from '@nestjs/cqrs';
+import { RedisModule } from '@shared/redis/redis.module';
 
 @Module({
     imports: [
@@ -29,6 +30,7 @@ import { CqrsModule } from '@nestjs/cqrs';
         ScheduleModule.forRoot(),
         CqrsModule,
         ClsModule.forRoot({
+            global: true,
             middleware: { mount: true },
             plugins: [
                 new ClsPluginTransactional({
@@ -40,6 +42,7 @@ import { CqrsModule } from '@nestjs/cqrs';
             ],
         }),
         PrismaModule,
+        RedisModule,
         QueueModule,
         EmailModule,
         AuthenticationModule,

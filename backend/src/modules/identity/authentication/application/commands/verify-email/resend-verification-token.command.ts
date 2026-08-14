@@ -1,3 +1,3 @@
 export class ResendVerificationTokenCommand {
-    constructor(public readonly email: string) {}
+    constructor(public readonly userId: string) {}
 }

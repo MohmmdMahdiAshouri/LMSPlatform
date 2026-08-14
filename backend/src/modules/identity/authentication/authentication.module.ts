@@ -26,7 +26,7 @@ import { AuthenticationService } from './application/services/authentication.ser
 import { JwtModule } from '@nestjs/jwt';
 import { AccessTokenGenerator } from './application/ports/access-token-generator.port';
 import { JwtTokenGenerator } from './infrastructure/security/jwt-token-generator';
-import { PrismaSessionRepository } from './infrastructure/persistence/prisma-session.respository';
+import { PrismaSessionRepository } from './infrastructure/persistence/prisma-session.repository';
 import { PrismaRefreshTokenRepository } from './infrastructure/persistence/prisma-refresh-token.repository';
 import { VerifyEmailHandler } from './application/commands/verify-email/verify-email.handler';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -40,6 +40,11 @@ import { ForgotPasswordHandler } from './application/commands/password/forgot-pa
 import { OUTBOX_REPOSITORY } from '@shared/common/domain/injection.token';
 import { PrismaOutboxRepository } from '@shared/common/infrastructure/prisma-outbox-message.repository';
 import { ResetPasswordHandler } from './application/commands/password/reset-password.handler';
+import { JwtStrategy } from './infrastructure/security/jwt-strategy';
+import { JwtAuthGuard } from './presentation/guards/jwt-auth-guard';
+import { APP_GUARD } from '@nestjs/core';
+import { PassportModule } from '@nestjs/passport';
+import { CachedSessionRepository } from './infrastructure/persistence/chached-session.repository';
 @Module({
     imports: [
         CqrsModule,
@@ -53,6 +58,7 @@ import { ResetPasswordHandler } from './application/commands/password/reset-pass
                 },
             }),
         }),
+        PassportModule.register({ defaultStrategy: 'jwt' }),
     ],
     controllers: [AuthenticationController, VerificationController, PasswordController],
     providers: [
@@ -67,6 +73,9 @@ import { ResetPasswordHandler } from './application/commands/password/reset-pass
         ResendVerificationTokenHandler,
         ForgotPasswordHandler,
         ResetPasswordHandler,
+        JwtStrategy,
+        JwtAuthGuard,
+        PrismaSessionRepository,
         {
             provide: USER_REPOSITORY,
             useClass: PrismaUserRepository,
@@ -97,7 +106,7 @@ import { ResetPasswordHandler } from './application/commands/password/reset-pass
             provide: PASSWORD_RESET_TOKEN_REPOSITORY,
             useClass: PrismaPasswordResetTokenRepository,
         },
-        { provide: SESSION_REPOSITORY, useClass: PrismaSessionRepository },
+        { provide: SESSION_REPOSITORY, useClass: CachedSessionRepository },
         { provide: REFRESH_TOKEN_REPOSITORY, useClass: PrismaRefreshTokenRepository },
         {
             provide: AccessTokenGenerator,
@@ -107,6 +116,7 @@ import { ResetPasswordHandler } from './application/commands/password/reset-pass
             provide: OUTBOX_REPOSITORY,
             useClass: PrismaOutboxRepository,
         },
+        { provide: APP_GUARD, useClass: JwtAuthGuard },
     ],
     exports: [AccessTokenGenerator, SESSION_REPOSITORY, REFRESH_TOKEN_REPOSITORY],
 })

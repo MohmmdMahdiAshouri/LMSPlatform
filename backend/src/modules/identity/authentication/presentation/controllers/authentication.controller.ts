@@ -10,7 +10,8 @@ import { AuthenticationContextMapper } from '../mappers/authentication-context.m
 import { LoginDto } from '../dto/Login.dto';
 import { LoginCommand } from '../../application/commands/login/login.command';
 import { LoginSwagger } from '../swagger/login.swagger';
-
+import { Public } from '../decorators/public.decorator';
+@Public()
 @Controller('auth')
 export class AuthenticationController {
     constructor(
