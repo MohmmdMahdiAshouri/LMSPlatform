@@ -13,7 +13,7 @@ import {
     USER_REPOSITORY,
     VERIFICATION_TOKEN_REPOSITORY,
 } from './application/tokens/injection.token';
-import { RegisterHandler } from './application/commands/register/register.handler';
+import { RegisterHandler } from './application/commands/auth/register.handler';
 import { BcryptPasswordHasher } from './infrastructure/security/bcrypt-password-hasher';
 import { UserRegisteredEventHandler } from './application/event-handlers/verification-token.event.handler';
 import { TokenGeneratorFactory } from './application/factories/token-generator.factory';
@@ -31,7 +31,7 @@ import { PrismaRefreshTokenRepository } from './infrastructure/persistence/prism
 import { VerifyEmailHandler } from './application/commands/verify-email/verify-email.handler';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthenticationContextMapper } from './presentation/mappers/authentication-context.mapper';
-import { LoginHandler } from './application/commands/login/login.handler';
+import { LoginHandler } from './application/commands/auth/login.handler';
 import { ResendVerificationTokenHandler } from './application/commands/verify-email/resend-verification-token.handler';
 import { VerificationController } from './presentation/controllers/verification.controller';
 import { PrismaPasswordResetTokenRepository } from './infrastructure/persistence/prisma-password-reset-token.repository';
@@ -44,8 +44,10 @@ import { JwtStrategy } from './infrastructure/security/jwt-strategy';
 import { JwtAuthGuard } from './presentation/guards/jwt-auth-guard';
 import { APP_GUARD } from '@nestjs/core';
 import { PassportModule } from '@nestjs/passport';
-import { CachedSessionRepository } from './infrastructure/persistence/chached-session.repository';
+import { CachedSessionRepository } from './infrastructure/persistence/cached-session.repository';
 import { ChangePasswordHandler } from './application/commands/password/change-password.handler';
+import { CachedUserRepository } from './infrastructure/persistence/cached-user.repository';
+import { RefreshTokenHandler } from './application/commands/auth/refresh-token.handler';
 @Module({
     imports: [
         CqrsModule,
@@ -78,9 +80,12 @@ import { ChangePasswordHandler } from './application/commands/password/change-pa
         JwtAuthGuard,
         PrismaSessionRepository,
         ChangePasswordHandler,
+        PrismaUserRepository,
+        PrismaRefreshTokenRepository,
+        RefreshTokenHandler,
         {
             provide: USER_REPOSITORY,
-            useClass: PrismaUserRepository,
+            useClass: CachedUserRepository,
         },
         {
             provide: PASSWORD_HASHER,

@@ -2,15 +2,18 @@ import { Body, Controller, HttpStatus, Post, Req, Res } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegisterDto } from '../dto/register.dto';
 import { Response } from '@shared/response-handling/decorators/response.decorator';
-import { RegisterCommand } from '../../application/commands/register/register.command';
+import { RegisterCommand } from '../../application/commands/auth/register.command';
 import { RegisterSwagger } from '../swagger/register.swagger';
 import type { Request as ExpressRequest, Response as ExpressResponse } from 'express';
 import { AuthenticationResult } from '../../application/contracts/authentication-result';
 import { AuthenticationContextMapper } from '../mappers/authentication-context.mapper';
 import { LoginDto } from '../dto/Login.dto';
-import { LoginCommand } from '../../application/commands/login/login.command';
+import { LoginCommand } from '../../application/commands/auth/login.command';
 import { LoginSwagger } from '../swagger/login.swagger';
 import { Public } from '../decorators/public.decorator';
+import { RefreshTokenCommand } from '../../application/commands/auth/refresh-token.command';
+import { RefreshTokenSwagger } from '../swagger/refresh-token.swagger';
+import { RefreshTokenCookie } from '../decorators/refresh-token-cookie.decorator';
 @Public()
 @Controller('auth')
 export class AuthenticationController {
@@ -52,6 +55,17 @@ export class AuthenticationController {
         const reqContext = this.authenticationContext.formRequest(req);
         const result = await this.commandBus.execute<LoginCommand, AuthenticationResult>(
             new LoginCommand(loginDto.emailOrUsername, loginDto.password, reqContext),
+        );
+        this.authenticationContext.formResponse(res, result.refreshToken);
+        return { accessToken: result.accessToken };
+    }
+
+    @Post('refresh-token')
+    @RefreshTokenSwagger()
+    @Response({ statusCode: HttpStatus.OK })
+    async refreshToken(@RefreshTokenCookie() refreshToken: string, @Res({ passthrough: true }) res: ExpressResponse) {
+        const result = await this.commandBus.execute<RefreshTokenCommand, AuthenticationResult>(
+            new RefreshTokenCommand(refreshToken),
         );
         this.authenticationContext.formResponse(res, result.refreshToken);
         return { accessToken: result.accessToken };
