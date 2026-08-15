@@ -39,6 +39,14 @@ export class PrismaRefreshTokenRepository implements RefreshTokenRepository {
         return RefreshTokenMapper.toDomain(refreshToken);
     }
 
+    async findByTokenHash(tokenHash: string): Promise<RefreshToken | null> {
+        const refreshToken = await this.txHost.tx.refreshToken.findFirst({
+            where: { tokenHash },
+        });
+        if (!refreshToken) return null;
+        return RefreshTokenMapper.toDomain(refreshToken);
+    }
+
     async delete(id: string): Promise<void> {
         await this.txHost.tx.refreshToken.delete({
             where: { id },

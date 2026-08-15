@@ -9,5 +9,7 @@ export abstract class RefreshTokenRepository {
 
     abstract findBySessionId(sessionId: string): Promise<RefreshToken | null>;
 
+    abstract findByTokenHash(tokenHash: string): Promise<RefreshToken | null>;
+
     abstract delete(id: string): Promise<void>;
 }

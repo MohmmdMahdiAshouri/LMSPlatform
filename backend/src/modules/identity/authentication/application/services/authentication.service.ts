@@ -47,13 +47,13 @@ export class AuthenticationService {
         );
 
         if (existingSession) {
-            return this.reuseSession(user, existingSession);
+            return this.rotateRefreshToken(user, existingSession);
         }
 
         return this.createNewSession(user, context);
     }
 
-    private async createNewSession(user: User, context: AuthenticationContext): Promise<AuthenticationResult> {
+    async createNewSession(user: User, context: AuthenticationContext): Promise<AuthenticationResult> {
         //generate refresh token
         const plainRefreshToken = this.tokenGenerator.generate();
         const hashedRefreshToken = this.tokenHasher.hash(plainRefreshToken);
@@ -86,7 +86,8 @@ export class AuthenticationService {
         };
     }
 
-    private async reuseSession(user: User, session: Session): Promise<AuthenticationResult> {
+    @Transactional()
+    async rotateRefreshToken(user: User, session: Session): Promise<AuthenticationResult> {
         const plainRefreshToken = this.tokenGenerator.generate();
         const hashedRefreshToken = this.tokenHasher.hash(plainRefreshToken);
 
@@ -95,12 +96,7 @@ export class AuthenticationService {
             throw new RefreshTokenNotFoundException();
         }
 
-        const expiresAt = new Date(
-            this.clock.now().getTime() + AuthenticationService.EXPIRES_IN_DAYS * 24 * 60 * 60 * 1000,
-        );
-
-        refreshToken.rotate(hashedRefreshToken, expiresAt);
-
+        refreshToken.rotate(hashedRefreshToken);
         await this.refreshTokenRepository.update(refreshToken);
 
         const accessToken = await this.accessTokenGenerator.generate(user, session);
@@ -130,6 +126,7 @@ export class AuthenticationService {
         }
     }
 
+    @Transactional()
     async revokeAllSessionsExcept(userId: string, currentSessionId: string) {
         const allSessions = await this.sessionRepository.findAllActiveByUserId(userId);
         const sessions = allSessions.filter((s) => s.getId() !== currentSessionId);

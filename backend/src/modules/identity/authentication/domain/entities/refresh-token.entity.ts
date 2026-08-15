@@ -31,9 +31,8 @@ export class RefreshToken {
         this.revokedAt = new Date();
     }
 
-    rotate(hash: string, expiresAt: Date): void {
+    rotate(hash: string): void {
         this.tokenHash = hash;
-        this.expiresAt = expiresAt;
     }
 
     isExpired(): boolean {
