@@ -48,6 +48,8 @@ import { CachedSessionRepository } from './infrastructure/persistence/cached-ses
 import { ChangePasswordHandler } from './application/commands/password/change-password.handler';
 import { CachedUserRepository } from './infrastructure/persistence/cached-user.repository';
 import { RefreshTokenHandler } from './application/commands/auth/refresh-token.handler';
+import { LogoutCurrentDeviceHandler } from './application/commands/session/logout-current-device.handler';
+import { SessionController } from './presentation/controllers/session.controller';
 @Module({
     imports: [
         CqrsModule,
@@ -63,7 +65,7 @@ import { RefreshTokenHandler } from './application/commands/auth/refresh-token.h
         }),
         PassportModule.register({ defaultStrategy: 'jwt' }),
     ],
-    controllers: [AuthenticationController, VerificationController, PasswordController],
+    controllers: [AuthenticationController, VerificationController, PasswordController, SessionController],
     providers: [
         RegisterHandler,
         VerifyEmailHandler,
@@ -83,6 +85,7 @@ import { RefreshTokenHandler } from './application/commands/auth/refresh-token.h
         PrismaUserRepository,
         PrismaRefreshTokenRepository,
         RefreshTokenHandler,
+        LogoutCurrentDeviceHandler,
         {
             provide: USER_REPOSITORY,
             useClass: CachedUserRepository,
