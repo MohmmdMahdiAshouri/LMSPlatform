@@ -19,6 +19,8 @@ import {
 } from '../tokens/injection.token';
 import { RefreshTokenNotFoundException } from '../../domain/exceptions/refresh-token-not-found.exception';
 import { Transactional } from '@nestjs-cls/transactional';
+import { SessionIsInvalidOrRevokedException } from '../../domain/exceptions/session-is-invalid-or-revoked.exception';
+import { InvalidRefreshTokenException } from '../../domain/exceptions/invalid-refresh-token.exception';
 export class AuthenticationService {
     private static readonly EXPIRES_IN_DAYS = 15;
 
@@ -123,5 +125,22 @@ export class AuthenticationService {
             refreshToken.revoke();
             await this.refreshTokenRepository.update(refreshToken);
         }
+    }
+
+    @Transactional()
+    async revokeSession(userId: string, sessionId: string) {
+        const session = await this.sessionRepository.findById(sessionId);
+        if (!session || session.isRevoked()) throw new SessionIsInvalidOrRevokedException();
+
+        if (session.getUserId() !== userId) throw new SessionIsInvalidOrRevokedException();
+
+        const refreshToken = await this.refreshTokenRepository.findBySessionId(session.getId());
+        if (!refreshToken) throw new RefreshTokenNotFoundException();
+        if (refreshToken.isRevoked()) throw new InvalidRefreshTokenException();
+
+        refreshToken.revoke();
+        await this.refreshTokenRepository.update(refreshToken);
+        session.revoke();
+        await this.sessionRepository.update(session);
     }
 }

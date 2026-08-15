@@ -1,4 +1,4 @@
-import { Controller, Delete, HttpStatus, Post, Res } from '@nestjs/common';
+import { Controller, Delete, HttpStatus, Param, Post, Res } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Response } from '@shared/response-handling/decorators/response.decorator';
@@ -10,6 +10,8 @@ import { LogoutCurrentDeviceCommand } from '../../application/commands/session/l
 import { AuthenticationContextMapper } from '../mappers/authentication-context.mapper';
 import { LogoutAllDevicesCommand } from '../../application/commands/session/logout-all-devices.command';
 import { LogoutAllDevicesSwagger } from '../swagger/logout-all-devices.swagger';
+import { LogoutSpecificDeviceCommand } from '../../application/commands/session/logout-specific-device.command';
+import { LogoutSpecificDeviceSwagger } from '../swagger/logout.specific-device.swagger';
 
 @ApiBearerAuth('access-token')
 @Controller('auth')
@@ -49,5 +51,15 @@ export class SessionController {
         );
         this.authenticationContext.clearRefreshTokenCookie(res);
         return result;
+    }
+
+    @Delete('sessions/:sessionId')
+    @LogoutSpecificDeviceSwagger()
+    @Response({
+        statusCode: HttpStatus.OK,
+        message: 'Device logged out successfully.',
+    })
+    logoutSpecificDevice(@CurrentUser() user: AuthenticatedUser, @Param('sessionId') sessionId: string) {
+        return this.commandBus.execute(new LogoutSpecificDeviceCommand(user.userId, sessionId));
     }
 }

@@ -51,6 +51,7 @@ import { RefreshTokenHandler } from './application/commands/auth/refresh-token.h
 import { LogoutCurrentDeviceHandler } from './application/commands/session/logout-current-device.handler';
 import { SessionController } from './presentation/controllers/session.controller';
 import { LogoutAllSessionsHandler } from './application/commands/session/logout-all-devices.handler';
+import { LogoutSpecificDeviceHandler } from './application/commands/session/logout-specific-device.handler';
 @Module({
     imports: [
         CqrsModule,
@@ -88,6 +89,7 @@ import { LogoutAllSessionsHandler } from './application/commands/session/logout-
         RefreshTokenHandler,
         LogoutCurrentDeviceHandler,
         LogoutAllSessionsHandler,
+        LogoutSpecificDeviceHandler,
         {
             provide: USER_REPOSITORY,
             useClass: CachedUserRepository,
