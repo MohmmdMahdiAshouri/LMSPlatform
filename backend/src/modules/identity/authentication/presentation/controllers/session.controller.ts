@@ -1,4 +1,4 @@
-import { Controller, HttpStatus, Post, Res } from '@nestjs/common';
+import { Controller, Delete, HttpStatus, Post, Res } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Response } from '@shared/response-handling/decorators/response.decorator';
@@ -8,6 +8,8 @@ import type { Response as ExpressResponse } from 'express';
 import type { AuthenticatedUser } from '../../application/ports/authenticated-user.port';
 import { LogoutCurrentDeviceCommand } from '../../application/commands/session/logout-current-device.command';
 import { AuthenticationContextMapper } from '../mappers/authentication-context.mapper';
+import { LogoutAllDevicesCommand } from '../../application/commands/session/logout-all-devices.command';
+import { LogoutAllDevicesSwagger } from '../swagger/logout-all-devices.swagger';
 
 @ApiBearerAuth('access-token')
 @Controller('auth')
@@ -32,6 +34,20 @@ export class SessionController {
         );
         this.authenticationContext.clearRefreshTokenCookie(res);
 
+        return result;
+    }
+
+    @Delete('sessions')
+    @LogoutAllDevicesSwagger()
+    @Response({
+        statusCode: HttpStatus.OK,
+        message: 'All devices Logged out successfully.',
+    })
+    async logoutAllDevices(@CurrentUser() user: AuthenticatedUser, @Res({ passthrough: true }) res: ExpressResponse) {
+        const result = await this.commandBus.execute<LogoutAllDevicesCommand, void>(
+            new LogoutAllDevicesCommand(user.userId),
+        );
+        this.authenticationContext.clearRefreshTokenCookie(res);
         return result;
     }
 }
