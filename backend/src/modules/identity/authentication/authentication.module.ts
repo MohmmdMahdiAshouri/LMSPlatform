@@ -50,6 +50,7 @@ import { CachedUserRepository } from './infrastructure/persistence/cached-user.r
 import { RefreshTokenHandler } from './application/commands/auth/refresh-token.handler';
 import { LogoutCurrentDeviceHandler } from './application/commands/session/logout-current-device.handler';
 import { SessionController } from './presentation/controllers/session.controller';
+import { LogoutAllSessionsHandler } from './application/commands/session/logout-all-devices.handler';
 @Module({
     imports: [
         CqrsModule,
@@ -86,6 +87,7 @@ import { SessionController } from './presentation/controllers/session.controller
         PrismaRefreshTokenRepository,
         RefreshTokenHandler,
         LogoutCurrentDeviceHandler,
+        LogoutAllSessionsHandler,
         {
             provide: USER_REPOSITORY,
             useClass: CachedUserRepository,
