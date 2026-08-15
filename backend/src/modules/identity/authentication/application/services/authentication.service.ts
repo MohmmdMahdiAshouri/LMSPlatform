@@ -19,7 +19,6 @@ import {
 } from '../tokens/injection.token';
 import { RefreshTokenNotFoundException } from '../../domain/exceptions/refresh-token-not-found.exception';
 import { Transactional } from '@nestjs-cls/transactional';
-
 export class AuthenticationService {
     private static readonly EXPIRES_IN_DAYS = 15;
 
@@ -110,26 +109,6 @@ export class AuthenticationService {
     @Transactional()
     async revokeAllSessions(userId: string): Promise<void> {
         const sessions = await this.sessionRepository.findAllActiveByUserId(userId);
-
-        for (const session of sessions) {
-            session.revoke();
-            await this.sessionRepository.update(session);
-
-            const refreshToken = await this.refreshTokenRepository.findBySessionId(session.getId());
-
-            if (!refreshToken) {
-                throw new RefreshTokenNotFoundException();
-            }
-
-            refreshToken.revoke();
-            await this.refreshTokenRepository.update(refreshToken);
-        }
-    }
-
-    @Transactional()
-    async revokeAllSessionsExcept(userId: string, currentSessionId: string) {
-        const allSessions = await this.sessionRepository.findAllActiveByUserId(userId);
-        const sessions = allSessions.filter((s) => s.getId() !== currentSessionId);
 
         for (const session of sessions) {
             session.revoke();

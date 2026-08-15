@@ -2,7 +2,9 @@ import type { Request, Response } from 'express';
 import { UAParser } from 'ua-parser-js';
 import { DeviceType } from '../../domain/enums/session.enum';
 import { AuthenticationContext } from '../../application/contracts/authentication-context';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class AuthenticationContextMapper {
     formRequest(req: Request): AuthenticationContext {
         const ua = new UAParser(req.headers['user-agent']).getResult();
@@ -29,6 +31,15 @@ export class AuthenticationContextMapper {
             sameSite: 'strict',
             path: '/',
             maxAge: 1000 * 60 * 60 * 24 * 15,
+        });
+    }
+
+    clearRefreshTokenCookie(res: Response) {
+        return res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'development' ? false : true,
+            sameSite: 'strict',
+            path: '/',
         });
     }
 }
