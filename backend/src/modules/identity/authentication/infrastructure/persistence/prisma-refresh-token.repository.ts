@@ -18,7 +18,7 @@ export class PrismaRefreshTokenRepository implements RefreshTokenRepository {
     async update(refreshToken: RefreshToken): Promise<void> {
         await this.txHost.tx.refreshToken.update({
             where: { id: refreshToken.getId() },
-            data: { tokenHash: refreshToken.getTokenHash(), expiresAt: refreshToken.getExpiresAt() },
+            data: RefreshTokenMapper.toPersistence(refreshToken),
         });
     }
 
