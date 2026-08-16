@@ -1,5 +1,5 @@
-import { Controller, Delete, HttpStatus, Param, Post, Res } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { Controller, Delete, Get, HttpStatus, Param, Post, Res } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Response } from '@shared/response-handling/decorators/response.decorator';
 import { LogoutCurrentDeviceSwagger } from '../swagger/logout-current-device.swagger';
@@ -12,12 +12,15 @@ import { LogoutAllDevicesCommand } from '../../application/commands/session/logo
 import { LogoutAllDevicesSwagger } from '../swagger/logout-all-devices.swagger';
 import { LogoutSpecificDeviceCommand } from '../../application/commands/session/logout-specific-device.command';
 import { LogoutSpecificDeviceSwagger } from '../swagger/logout.specific-device.swagger';
+import { GetActiveSessionsQuery } from '../../application/queries/sessions/get-active-sessions.query';
+import { GetActiveSessionsSwagger } from '../swagger/get-active-sessions.swagger';
 
 @ApiBearerAuth('access-token')
 @Controller('auth')
 export class SessionController {
     constructor(
         private readonly commandBus: CommandBus,
+        private readonly queryBus: QueryBus,
         private readonly authenticationContext: AuthenticationContextMapper,
     ) {}
 
@@ -61,5 +64,12 @@ export class SessionController {
     })
     logoutSpecificDevice(@CurrentUser() user: AuthenticatedUser, @Param('sessionId') sessionId: string) {
         return this.commandBus.execute(new LogoutSpecificDeviceCommand(user.userId, sessionId));
+    }
+
+    @Get('sessions')
+    @GetActiveSessionsSwagger()
+    @Response({ statusCode: HttpStatus.OK })
+    getActiveSessions(@CurrentUser() user: AuthenticatedUser) {
+        return this.queryBus.execute(new GetActiveSessionsQuery(user.userId));
     }
 }
