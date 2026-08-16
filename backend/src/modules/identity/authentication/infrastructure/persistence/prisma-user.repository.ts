@@ -6,7 +6,6 @@ import { Username } from '../../domain/value-objects/username.vo';
 import { UserMapper } from '../mappers/user.mapper';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
-
 @Injectable()
 export class PrismaUserRepository implements UserRepository {
     constructor(private readonly txHost: TransactionHost<TransactionalAdapterPrisma>) {}
@@ -40,18 +39,6 @@ export class PrismaUserRepository implements UserRepository {
         const user = await this.txHost.tx.user.findUnique({
             where: {
                 email: email.getValue(),
-            },
-        });
-
-        if (!user) return null;
-
-        return UserMapper.toDomain(user);
-    }
-
-    async findByUsername(username: Username): Promise<User | null> {
-        const user = await this.txHost.tx.user.findUnique({
-            where: {
-                username: username.getValue(),
             },
         });
 

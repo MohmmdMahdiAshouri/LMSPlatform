@@ -1,5 +1,5 @@
-import { Body, Controller, HttpStatus, Post, Req, Res } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { Body, Controller, Get, HttpStatus, Post, Req, Res } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { RegisterDto } from '../dto/register.dto';
 import { Response } from '@shared/response-handling/decorators/response.decorator';
 import { RegisterCommand } from '../../application/commands/auth/register.command';
@@ -14,15 +14,22 @@ import { Public } from '../decorators/public.decorator';
 import { RefreshTokenCommand } from '../../application/commands/auth/refresh-token.command';
 import { RefreshTokenSwagger } from '../swagger/refresh-token.swagger';
 import { RefreshTokenCookie } from '../decorators/refresh-token-cookie.decorator';
-@Public()
+import { CurrentUser } from '../decorators/current-user.decorator';
+import type { AuthenticatedUser } from '../../application/ports/authenticated-user.port';
+import { GetCurrentUserQuery } from '../../application/queries/me/get-current-user.query';
+import { GetCurrentUserSwagger } from '../swagger/get-current-user.swagger';
+import { ApiBearerAuth } from '@nestjs/swagger';
+
 @Controller('auth')
 export class AuthenticationController {
     constructor(
         private readonly commandBus: CommandBus,
+        private readonly queryBus: QueryBus,
         private readonly authenticationContext: AuthenticationContextMapper,
     ) {}
 
     @Post('register')
+    @Public()
     @RegisterSwagger()
     @Response({
         statusCode: HttpStatus.CREATED,
@@ -42,6 +49,7 @@ export class AuthenticationController {
     }
 
     @Post('login')
+    @Public()
     @LoginSwagger()
     @Response({
         statusCode: HttpStatus.OK,
@@ -61,6 +69,7 @@ export class AuthenticationController {
     }
 
     @Post('refresh-token')
+    @Public()
     @RefreshTokenSwagger()
     @Response({ statusCode: HttpStatus.OK })
     async refreshToken(@RefreshTokenCookie() refreshToken: string, @Res({ passthrough: true }) res: ExpressResponse) {
@@ -74,5 +83,13 @@ export class AuthenticationController {
             this.authenticationContext.clearRefreshTokenCookie(res);
             throw error;
         }
+    }
+
+    @Get('me')
+    @ApiBearerAuth('access-token')
+    @GetCurrentUserSwagger()
+    @Response({ statusCode: HttpStatus.OK })
+    getCurrentUser(@CurrentUser() user: AuthenticatedUser) {
+        return this.queryBus.execute(new GetCurrentUserQuery(user.userId));
     }
 }

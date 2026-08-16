@@ -1,4 +1,3 @@
-// infrastructure/persistence/cached-user.repository.ts
 import { Inject, Injectable } from '@nestjs/common';
 import type Redis from 'ioredis';
 import { UserRepository } from '../../domain/repositories/user.repository';
@@ -52,10 +51,6 @@ export class CachedUserRepository implements UserRepository {
 
     async findByEmail(email: Email): Promise<User | null> {
         return this.prismaUserRepository.findByEmail(email);
-    }
-
-    async findByUsername(username: Username): Promise<User | null> {
-        return this.prismaUserRepository.findByUsername(username);
     }
 
     async findByLoginIdentifier(identifier: string): Promise<User | null> {
