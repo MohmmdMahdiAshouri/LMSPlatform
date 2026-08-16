@@ -1,7 +1,6 @@
 import { Email } from '../value-objects/email.vo';
 import { Username } from '../value-objects/username.vo';
 import { User } from '../entities/user.entity';
-
 export abstract class UserRepository {
     abstract save(user: User): Promise<void>;
 
@@ -10,8 +9,6 @@ export abstract class UserRepository {
     abstract findById(id: string): Promise<User | null>;
 
     abstract findByEmail(email: Email): Promise<User | null>;
-
-    abstract findByUsername(username: Username): Promise<User | null>;
 
     abstract findByLoginIdentifier(identifier: string): Promise<User | null>;
 

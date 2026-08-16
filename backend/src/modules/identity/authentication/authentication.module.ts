@@ -52,6 +52,7 @@ import { LogoutCurrentDeviceHandler } from './application/commands/session/logou
 import { SessionController } from './presentation/controllers/session.controller';
 import { LogoutAllSessionsHandler } from './application/commands/session/logout-all-devices.handler';
 import { LogoutSpecificDeviceHandler } from './application/commands/session/logout-specific-device.handler';
+import { GetCurrentUserHandler } from './application/queries/me/get-current-user.handler';
 @Module({
     imports: [
         CqrsModule,
@@ -90,6 +91,7 @@ import { LogoutSpecificDeviceHandler } from './application/commands/session/logo
         LogoutCurrentDeviceHandler,
         LogoutAllSessionsHandler,
         LogoutSpecificDeviceHandler,
+        GetCurrentUserHandler,
         {
             provide: USER_REPOSITORY,
             useClass: CachedUserRepository,
