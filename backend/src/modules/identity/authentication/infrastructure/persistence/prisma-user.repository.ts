@@ -47,6 +47,16 @@ export class PrismaUserRepository implements UserRepository {
         return UserMapper.toDomain(user);
     }
 
+    async findByGoogleId(googleId: string): Promise<User | null> {
+        const user = await this.txHost.tx.user.findUnique({
+            where: { googleId },
+        });
+
+        if (!user) return null;
+
+        return UserMapper.toDomain(user);
+    }
+
     async findByLoginIdentifier(identifier: string): Promise<User | null> {
         const user = await this.txHost.tx.user.findFirst({
             where: {

@@ -53,6 +53,10 @@ export class CachedUserRepository implements UserRepository {
         return this.prismaUserRepository.findByEmail(email);
     }
 
+    async findByGoogleId(googleId: string): Promise<User | null> {
+        return this.prismaUserRepository.findByGoogleId(googleId);
+    }
+
     async findByLoginIdentifier(identifier: string): Promise<User | null> {
         return this.prismaUserRepository.findByLoginIdentifier(identifier);
     }
@@ -70,7 +74,9 @@ export class CachedUserRepository implements UserRepository {
             id: user.getId(),
             email: user.getEmail().getValue(),
             username: user.getUsername().getValue(),
-            passwordHash: user.getPasswordHash().getValue(),
+            passwordHash: user.getPasswordHash()?.getValue() ?? null,
+            googleId: user.getGoogleId(),
+            avatarUrl: user.getAvatarUrl(),
             emailVerifiedAt: user.getEmailVerifiedAt()?.toISOString() ?? null,
             status: user.getStatus(),
             failedLoginAttempts: user.getFailedLoginAttempts(),
@@ -97,7 +103,9 @@ export class CachedUserRepository implements UserRepository {
                 dto.id,
                 Email.create(dto.email),
                 Username.create(dto.username),
-                PasswordHash.create(dto.passwordHash),
+                dto.passwordHash ? PasswordHash.create(dto.passwordHash) : null,
+                dto.googleId ?? null,
+                dto.avatarUrl ?? null,
                 dto.emailVerifiedAt ? new Date(dto.emailVerifiedAt) : null,
                 dto.status,
                 dto.failedLoginAttempts,

@@ -6,4 +6,5 @@ export interface CurrentUserType {
     username: string;
     status: UserStatus;
     emailVerified: boolean;
+    avatarUrl: string | null;
 }

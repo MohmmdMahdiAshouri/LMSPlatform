@@ -10,6 +10,7 @@ import { AuthenticationService } from '../../services/authentication.service';
 import { PasswordIsIncorrectException } from '@modules/identity/authentication/domain/exceptions/password-is-incorrect.exception';
 import { UserInactiveException } from '@modules/identity/authentication/domain/exceptions/user-in-active.exception';
 import { UserLockedException } from '@modules/identity/authentication/domain/exceptions/user-locked.exception';
+import { PasswordLoginNotAvailableException } from '@modules/identity/authentication/domain/exceptions/password-login-not-available.exception';
 import { AuthenticationResult } from '../../contracts/authentication-result';
 
 @CommandHandler(LoginCommand)
@@ -32,8 +33,11 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
         }
 
         //check user password
+        if (!user.hasPassword()) {
+            throw new PasswordLoginNotAvailableException();
+        }
         const password = Password.create(command.password);
-        const isTruePassword = await this.passwordHasher.compare(password, user.getPasswordHash());
+        const isTruePassword = await this.passwordHasher.compare(password, user.getPasswordHash()!);
         if (!isTruePassword) {
             user.recordFailedLogin();
             await this.userRepository.update(user);
