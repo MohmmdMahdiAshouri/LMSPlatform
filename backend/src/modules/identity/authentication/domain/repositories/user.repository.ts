@@ -10,6 +10,8 @@ export abstract class UserRepository {
 
     abstract findByEmail(email: Email): Promise<User | null>;
 
+    abstract findByGoogleId(googleId: string): Promise<User | null>;
+
     abstract findByLoginIdentifier(identifier: string): Promise<User | null>;
 
     abstract existsByEmail(email: Email): Promise<boolean>;

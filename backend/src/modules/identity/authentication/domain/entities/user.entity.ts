@@ -11,7 +11,9 @@ export class User {
         private readonly id: string,
         private email: Email,
         private username: Username,
-        private passwordHash: PasswordHash,
+        private passwordHash: PasswordHash | null,
+        private readonly googleId: string | null,
+        private avatarUrl: string | null,
         private emailVerifiedAt: Date | null,
         private status: UserStatus,
         private failedLoginAttempts: number,
@@ -25,7 +27,9 @@ export class User {
         id: string,
         email: Email,
         username: Username,
-        passwordHash: PasswordHash,
+        passwordHash: PasswordHash | null,
+        googleId: string | null,
+        avatarUrl: string | null,
         emailVerifiedAt: Date | null,
         status: UserStatus,
         failedLoginAttempts: number,
@@ -39,6 +43,8 @@ export class User {
             email,
             username,
             passwordHash,
+            googleId,
+            avatarUrl,
             emailVerifiedAt,
             status,
             failedLoginAttempts,
@@ -52,7 +58,41 @@ export class User {
     static register(email: Email, username: Username, passwordHash: PasswordHash): User {
         const now = new Date();
 
-        return new User(randomUUID(), email, username, passwordHash, null, UserStatus.ACTIVE, 0, null, null, now, now);
+        return new User(
+            randomUUID(),
+            email,
+            username,
+            passwordHash,
+            null,
+            null,
+            null,
+            UserStatus.ACTIVE,
+            0,
+            null,
+            null,
+            now,
+            now,
+        );
+    }
+
+    static registerWithGoogle(email: Email, username: Username, googleId: string, avatarUrl: string | null): User {
+        const now = new Date();
+
+        return new User(
+            randomUUID(),
+            email,
+            username,
+            null,
+            googleId,
+            avatarUrl,
+            now,
+            UserStatus.ACTIVE,
+            0,
+            null,
+            null,
+            now,
+            now,
+        );
     }
 
     verifyEmail(): void {
@@ -133,6 +173,10 @@ export class User {
         return this.isActive() && !this.isLocked() && this.isEmailVerified();
     }
 
+    hasPassword(): boolean {
+        return this.passwordHash !== null;
+    }
+
     private touch(): void {
         this.updatedAt = new Date();
     }
@@ -151,8 +195,16 @@ export class User {
         return this.username;
     }
 
-    getPasswordHash(): PasswordHash {
+    getPasswordHash(): PasswordHash | null {
         return this.passwordHash;
+    }
+
+    getGoogleId(): string | null {
+        return this.googleId;
+    }
+
+    getAvatarUrl(): string | null {
+        return this.avatarUrl;
     }
 
     getStatus(): UserStatus {

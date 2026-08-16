@@ -12,8 +12,17 @@ export class SerializedUserDto {
     @IsString()
     username!: string;
 
+    @IsOptional()
     @IsString()
-    passwordHash!: string;
+    passwordHash!: string | null;
+
+    @IsOptional()
+    @IsString()
+    googleId!: string | null;
+
+    @IsOptional()
+    @IsString()
+    avatarUrl!: string | null;
 
     @IsOptional()
     @IsISO8601()

@@ -18,7 +18,14 @@ import { CurrentUser } from '../decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../../application/ports/authenticated-user.port';
 import { GetCurrentUserQuery } from '../../application/queries/me/get-current-user.query';
 import { GetCurrentUserSwagger } from '../swagger/get-current-user.swagger';
+import { GoogleLoginCommand } from '../../application/commands/auth/google-login.command';
+import { GoogleLoginSwagger, GoogleCallbackSwagger } from '../swagger/google-login.swagger';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import type { GoogleUserProfile } from '../../application/contracts/google-user-profile';
+import { ConfigService } from '@nestjs/config';
+import { GoogleUser } from '../decorators/google-user.decorator';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -26,6 +33,7 @@ export class AuthenticationController {
         private readonly commandBus: CommandBus,
         private readonly queryBus: QueryBus,
         private readonly authenticationContext: AuthenticationContextMapper,
+        private readonly configService: ConfigService,
     ) {}
 
     @Post('register')
@@ -66,6 +74,33 @@ export class AuthenticationController {
         );
         this.authenticationContext.formResponse(res, result.refreshToken);
         return { accessToken: result.accessToken };
+    }
+
+    @Get('google')
+    @Public()
+    @UseGuards(AuthGuard('google'))
+    @GoogleLoginSwagger()
+    googleAuth() {
+        // Guard redirects the user to Google's consent screen
+    }
+
+    @Get('google/callback')
+    @Public()
+    @UseGuards(AuthGuard('google'))
+    @GoogleCallbackSwagger()
+    async googleAuthCallback(
+        @GoogleUser() googleUser: GoogleUserProfile,
+        @Req() req: ExpressRequest,
+        @Res() res: ExpressResponse,
+    ) {
+        const reqContext = this.authenticationContext.formRequest(req);
+        const result = await this.commandBus.execute<GoogleLoginCommand, AuthenticationResult>(
+            new GoogleLoginCommand(googleUser, reqContext),
+        );
+        this.authenticationContext.formResponse(res, result.refreshToken);
+
+        const frontendUrl = this.configService.get<string>('GOOGLE_LOGIN_SUCCESS_REDIRECT');
+        res.redirect(HttpStatus.FOUND, `${frontendUrl}?accessToken=${result.accessToken}`);
     }
 
     @Post('refresh-token')

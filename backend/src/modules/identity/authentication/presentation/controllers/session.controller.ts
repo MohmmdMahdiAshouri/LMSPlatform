@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, HttpStatus, Param, Post, Res } from '@nestjs/common';
+import { Controller, Delete, Get, HttpStatus, Param, Res } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Response } from '@shared/response-handling/decorators/response.decorator';
@@ -24,7 +24,7 @@ export class SessionController {
         private readonly authenticationContext: AuthenticationContextMapper,
     ) {}
 
-    @Post('logout')
+    @Delete('logout')
     @LogoutCurrentDeviceSwagger()
     @Response({
         statusCode: HttpStatus.OK,

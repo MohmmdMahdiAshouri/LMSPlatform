@@ -14,6 +14,7 @@ import { UserNotFoundException } from '@modules/identity/authentication/domain/e
 import { PasswordSameAsOldException } from '@modules/identity/authentication/domain/exceptions/password-same-as-old.exception';
 import { PasswordHash } from '@modules/identity/authentication/domain/value-objects/password-hash.vo';
 import { PasswordIsIncorrectException } from '@modules/identity/authentication/domain/exceptions/password-is-incorrect.exception';
+import { PasswordLoginNotAvailableException } from '@modules/identity/authentication/domain/exceptions/password-login-not-available.exception';
 import { SessionRepository } from '@modules/identity/authentication/domain/repositories/session.repository';
 import { RefreshTokenRepository } from '@modules/identity/authentication/domain/repositories/refresh-token.repository';
 import { RefreshTokenNotFoundException } from '@modules/identity/authentication/domain/exceptions/refresh-token-not-found.exception';
@@ -40,10 +41,14 @@ export class ChangePasswordHandler implements ICommandHandler<ChangePasswordComm
         const currentPassword = Password.create(command.currentPassword);
         const newPassword = Password.create(command.newPassword);
 
-        const isValidCurrentPassword = await this.passwordHasher.compare(currentPassword, user.getPasswordHash());
+        if (!user.hasPassword()) {
+            throw new PasswordLoginNotAvailableException();
+        }
+
+        const isValidCurrentPassword = await this.passwordHasher.compare(currentPassword, user.getPasswordHash()!);
         if (!isValidCurrentPassword) throw new PasswordIsIncorrectException();
 
-        const isSamePassword = await this.passwordHasher.compare(newPassword, user.getPasswordHash());
+        const isSamePassword = await this.passwordHasher.compare(newPassword, user.getPasswordHash()!);
         if (isSamePassword) throw new PasswordSameAsOldException();
 
         const hash = await this.passwordHasher.hash(newPassword);

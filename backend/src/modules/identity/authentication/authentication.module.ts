@@ -54,6 +54,8 @@ import { LogoutAllSessionsHandler } from './application/commands/session/logout-
 import { LogoutSpecificDeviceHandler } from './application/commands/session/logout-specific-device.handler';
 import { GetCurrentUserHandler } from './application/queries/me/get-current-user.handler';
 import { GetActiveSessionsHandler } from './application/queries/sessions/get-active-sessions.handler';
+import { GoogleLoginHandler } from './application/commands/auth/google-login.handler';
+import { GoogleStrategy } from './infrastructure/security/google.strategy';
 @Module({
     imports: [
         CqrsModule,
@@ -94,6 +96,8 @@ import { GetActiveSessionsHandler } from './application/queries/sessions/get-act
         LogoutSpecificDeviceHandler,
         GetCurrentUserHandler,
         GetActiveSessionsHandler,
+        GoogleLoginHandler,
+        GoogleStrategy,
         {
             provide: USER_REPOSITORY,
             useClass: CachedUserRepository,
@@ -130,10 +134,7 @@ import { GetActiveSessionsHandler } from './application/queries/sessions/get-act
             provide: AccessTokenGenerator,
             useClass: JwtTokenGenerator,
         },
-        {
-            provide: OUTBOX_REPOSITORY,
-            useClass: PrismaOutboxRepository,
-        },
+        { provide: OUTBOX_REPOSITORY, useClass: PrismaOutboxRepository },
         { provide: APP_GUARD, useClass: JwtAuthGuard },
     ],
     exports: [AccessTokenGenerator, SESSION_REPOSITORY, REFRESH_TOKEN_REPOSITORY],

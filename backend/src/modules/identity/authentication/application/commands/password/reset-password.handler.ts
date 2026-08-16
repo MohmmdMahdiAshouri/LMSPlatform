@@ -49,7 +49,8 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPasswordComman
             throw new UserNotFoundException();
         }
 
-        const isSamePassword = await this.passwordHasher.compare(newPassword, user.getPasswordHash());
+        const isSamePassword =
+            user.hasPassword() && (await this.passwordHasher.compare(newPassword, user.getPasswordHash()!));
         if (isSamePassword) throw new PasswordSameAsOldException();
 
         const hash = await this.passwordHasher.hash(newPassword);
