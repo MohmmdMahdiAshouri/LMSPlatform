@@ -5,8 +5,8 @@ export enum SessionStatus {
 }
 
 export enum DeviceType {
-    DESKTOP,
-    MOBILE,
-    TABLET,
-    UNKNOWN,
+    DESKTOP = 'DESKTOP',
+    MOBILE = 'MOBILE',
+    TABLET = 'TABLET',
+    UNKNOWN = 'UNKNOWN',
 }
