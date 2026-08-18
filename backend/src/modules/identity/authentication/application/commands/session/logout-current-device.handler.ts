@@ -5,7 +5,7 @@ import { AuthenticationService } from '../../services/authentication.service';
 @CommandHandler(LogoutCurrentDeviceCommand)
 export class LogoutCurrentDeviceHandler implements ICommandHandler<LogoutCurrentDeviceCommand> {
     constructor(private readonly authenticationService: AuthenticationService) {}
-    async execute(command: LogoutCurrentDeviceCommand): Promise<any> {
+    async execute(command: LogoutCurrentDeviceCommand): Promise<void> {
         await this.authenticationService.revokeSession(command.userId, command.sessionId);
     }
 }

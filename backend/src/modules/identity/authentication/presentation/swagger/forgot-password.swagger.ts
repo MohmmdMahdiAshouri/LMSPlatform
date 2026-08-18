@@ -9,11 +9,6 @@ export function ForgotPasswordSwagger() {
             description: 'Sent password recovery',
         }),
 
-        ApiResponse({
-            status: 404,
-            description: 'Not found.',
-        }),
-
         ApiBody({
             type: ForgotPasswordDto,
         }),

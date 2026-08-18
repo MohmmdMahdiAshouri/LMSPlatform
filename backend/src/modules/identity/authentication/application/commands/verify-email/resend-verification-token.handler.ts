@@ -9,6 +9,7 @@ import { UserNotFoundException } from '@modules/identity/authentication/domain/e
 import { VerificationTokenResendTooSoonException } from '@modules/identity/authentication/domain/exceptions/verification-token-resend-too-soon.exception';
 import { EmailAlreadyVerifiedException } from '@modules/identity/authentication/domain/exceptions/email-already-verified.exception';
 import { Transactional } from '@nestjs-cls/transactional';
+import { AUTH_CONFIG } from '../../config/auth-config';
 
 @CommandHandler(ResendVerificationTokenCommand)
 export class ResendVerificationTokenHandler implements ICommandHandler<ResendVerificationTokenCommand> {
@@ -21,7 +22,7 @@ export class ResendVerificationTokenHandler implements ICommandHandler<ResendVer
         private readonly verificationTokenService: VerificationTokenService,
     ) {}
     @Transactional()
-    async execute(command: ResendVerificationTokenCommand): Promise<any> {
+    async execute(command: ResendVerificationTokenCommand): Promise<void> {
         const user = await this.userRepository.findById(command.userId);
         if (!user) {
             throw new UserNotFoundException();
@@ -32,7 +33,7 @@ export class ResendVerificationTokenHandler implements ICommandHandler<ResendVer
         const oldVerificationToken = await this.verificationTokenRepository.findActiveByUserId(user.getId());
 
         if (oldVerificationToken) {
-            if (Date.now() - oldVerificationToken.getCreatedAt().getTime() < 1000 * 60 * 2) {
+            if (Date.now() - oldVerificationToken.getCreatedAt().getTime() < AUTH_CONFIG.RESEND_COOLDOWN_MS) {
                 throw new VerificationTokenResendTooSoonException();
             }
             oldVerificationToken.revoke();

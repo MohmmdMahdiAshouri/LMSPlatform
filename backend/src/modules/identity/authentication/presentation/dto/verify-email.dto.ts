@@ -8,6 +8,5 @@ export class VerifyEmailDto {
     })
     @IsNotEmpty({ message: 'Verification token is required' })
     @IsString()
-    @IsNotEmpty()
     readonly verificationToken!: string;
 }

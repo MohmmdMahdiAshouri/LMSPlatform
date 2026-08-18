@@ -36,7 +36,7 @@ export class SessionMapper {
             expiresAt: session.getExpiresAt(),
             revokedAt: session.getRevokedAt(),
             createdAt: session.getCreatedAt(),
-            updatedAt: new Date(),
+            updatedAt: session.getUpdatedAt(),
         };
     }
 }

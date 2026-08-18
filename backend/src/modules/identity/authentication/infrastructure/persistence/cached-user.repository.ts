@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import type Redis from 'ioredis';
 import { UserRepository } from '../../domain/repositories/user.repository';
 import { User } from '../../domain/entities/user.entity';
@@ -10,19 +10,21 @@ import { PrismaUserRepository } from './prisma-user.repository';
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import { SerializedUserDto } from './dto/serialized-user.dto';
+import { AUTH_CONFIG } from '../../application/config/auth-config';
 
-const USER_CACHE_TTL_SECONDS = 60 * 15;
 const cacheKey = (userId: string) => `user:${userId}`;
 
 @Injectable()
 export class CachedUserRepository implements UserRepository {
+    private readonly logger = new Logger(CachedUserRepository.name);
+
     constructor(
         private readonly prismaUserRepository: PrismaUserRepository,
         @Inject(REDIS_CLIENT) private readonly redis: Redis,
     ) {}
 
     async findById(id: string): Promise<User | null> {
-        const cached = await this.redis.get(cacheKey(id));
+        const cached = await this.safeGet(cacheKey(id));
         if (cached) {
             const user = await this.tryDeserialize(cached, id);
             if (user) return user;
@@ -31,7 +33,7 @@ export class CachedUserRepository implements UserRepository {
         const user = await this.prismaUserRepository.findById(id);
         if (!user) return null;
 
-        await this.redis.set(cacheKey(id), this.serialize(user), 'EX', USER_CACHE_TTL_SECONDS);
+        await this.safeSet(cacheKey(id), this.serialize(user));
         return user;
     }
 
@@ -41,12 +43,12 @@ export class CachedUserRepository implements UserRepository {
 
     async update(user: User): Promise<void> {
         await this.prismaUserRepository.update(user);
-        await this.redis.del(cacheKey(user.getId()));
+        await this.safeDel(cacheKey(user.getId()));
     }
 
     async delete(id: string): Promise<void> {
         await this.prismaUserRepository.delete(id);
-        await this.redis.del(cacheKey(id));
+        await this.safeDel(cacheKey(id));
     }
 
     async findByEmail(email: Email): Promise<User | null> {
@@ -95,7 +97,7 @@ export class CachedUserRepository implements UserRepository {
             const errors = validateSync(dto);
 
             if (errors.length > 0) {
-                await this.redis.del(cacheKey(id));
+                await this.safeDel(cacheKey(id));
                 return null;
             }
 
@@ -115,8 +117,33 @@ export class CachedUserRepository implements UserRepository {
                 new Date(dto.updatedAt),
             );
         } catch {
-            await this.redis.del(cacheKey(id));
+            await this.safeDel(cacheKey(id));
             return null;
+        }
+    }
+
+    private async safeGet(key: string): Promise<string | null> {
+        try {
+            return await this.redis.get(key);
+        } catch (error) {
+            this.logger.warn(`Redis get failed for ${key}: ${(error as Error).message}`);
+            return null;
+        }
+    }
+
+    private async safeSet(key: string, value: string): Promise<void> {
+        try {
+            await this.redis.set(key, value, 'EX', AUTH_CONFIG.CACHE_TTL_SECONDS);
+        } catch (error) {
+            this.logger.warn(`Redis set failed for ${key}: ${(error as Error).message}`);
+        }
+    }
+
+    private async safeDel(key: string): Promise<void> {
+        try {
+            await this.redis.del(key);
+        } catch (error) {
+            this.logger.warn(`Redis del failed for ${key}: ${(error as Error).message}`);
         }
     }
 }

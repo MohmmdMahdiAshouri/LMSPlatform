@@ -34,7 +34,7 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand>
         const hashedRefreshToken = this.tokenHasher.hash(command.refreshToken);
 
         const refreshToken = await this.refreshTokenRepository.findByTokenHash(hashedRefreshToken);
-        if (!refreshToken || !refreshToken.isValid) throw new InvalidRefreshTokenException();
+        if (!refreshToken || !refreshToken.isValid()) throw new InvalidRefreshTokenException();
 
         const session = await this.sessionRepository.findById(refreshToken.getSessionId());
         if (!session || !session.canRefresh()) throw new SessionIsInvalidOrRevokedException();

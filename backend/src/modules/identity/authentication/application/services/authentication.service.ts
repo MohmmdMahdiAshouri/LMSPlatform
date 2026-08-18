@@ -9,7 +9,7 @@ import { AccessTokenGenerator } from '../ports/access-token-generator.port';
 import { Clock } from '../ports/clock.port';
 import { TokenGenerator } from '../ports/token-generator.port';
 import { TokenHasher } from '../ports/token-hasher.port';
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
     CLOCK,
     REFRESH_TOKEN_REPOSITORY,
@@ -20,10 +20,9 @@ import {
 import { RefreshTokenNotFoundException } from '../../domain/exceptions/refresh-token-not-found.exception';
 import { Transactional } from '@nestjs-cls/transactional';
 import { SessionIsInvalidOrRevokedException } from '../../domain/exceptions/session-is-invalid-or-revoked.exception';
-import { InvalidRefreshTokenException } from '../../domain/exceptions/invalid-refresh-token.exception';
+import { AUTH_CONFIG } from '../config/auth-config';
+@Injectable()
 export class AuthenticationService {
-    private static readonly EXPIRES_IN_DAYS = 15;
-
     constructor(
         @Inject(TOKEN_GENERATOR)
         private readonly tokenGenerator: TokenGenerator,
@@ -61,7 +60,7 @@ export class AuthenticationService {
 
         //create session and refresh token
         const now = this.clock.now();
-        const expiresAt = new Date(now.getTime() + AuthenticationService.EXPIRES_IN_DAYS * 24 * 60 * 60 * 1000);
+        const expiresAt = new Date(now.getTime() + AUTH_CONFIG.SESSION_EXPIRES_IN_DAYS * 24 * 60 * 60 * 1000);
         const session = Session.create(
             user.getId(),
             context.deviceType,
@@ -100,6 +99,10 @@ export class AuthenticationService {
         refreshToken.rotate(hashedRefreshToken);
         await this.refreshTokenRepository.update(refreshToken);
 
+        //keep lastActivityAt accurate while preserving the absolute 15-day expiry
+        session.refreshActivity(this.clock.now(), session.getExpiresAt());
+        await this.sessionRepository.update(session);
+
         const accessToken = await this.accessTokenGenerator.generate(user, session);
 
         return {
@@ -113,30 +116,23 @@ export class AuthenticationService {
         const sessions = await this.sessionRepository.findAllActiveByUserId(userId);
 
         for (const session of sessions) {
-            session.revoke();
-            await this.sessionRepository.update(session);
-
-            const refreshToken = await this.refreshTokenRepository.findBySessionId(session.getId());
-
-            if (!refreshToken) {
-                throw new RefreshTokenNotFoundException();
-            }
-
-            refreshToken.revoke();
-            await this.refreshTokenRepository.update(refreshToken);
+            await this.revokeSessionAndToken(session);
         }
     }
 
     @Transactional()
-    async revokeSession(userId: string, sessionId: string) {
+    async revokeSession(userId: string, sessionId: string): Promise<void> {
         const session = await this.sessionRepository.findById(sessionId);
         if (!session || session.isRevoked()) throw new SessionIsInvalidOrRevokedException();
 
         if (session.getUserId() !== userId) throw new SessionIsInvalidOrRevokedException();
 
+        await this.revokeSessionAndToken(session);
+    }
+
+    async revokeSessionAndToken(session: Session): Promise<void> {
         const refreshToken = await this.refreshTokenRepository.findBySessionId(session.getId());
         if (!refreshToken) throw new RefreshTokenNotFoundException();
-        if (refreshToken.isRevoked()) throw new InvalidRefreshTokenException();
 
         refreshToken.revoke();
         await this.refreshTokenRepository.update(refreshToken);

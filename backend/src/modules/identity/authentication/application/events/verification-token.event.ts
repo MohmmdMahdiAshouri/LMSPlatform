@@ -1,4 +1,6 @@
 export class VerificationTokenEvent {
+    static readonly TYPE = 'VerificationTokenEvent';
+
     constructor(
         public readonly userId: string,
         public readonly email: string,

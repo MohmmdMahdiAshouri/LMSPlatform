@@ -3,6 +3,6 @@ import { BusinessRuleViolationException } from '@shared/error-handling/common/bu
 
 export class PasswordIsIncorrectException extends BusinessRuleViolationException {
     constructor() {
-        super(AuthErrorCode.PASSWROD_IS_INCORRECT, `Your password is incorrect.`);
+        super(AuthErrorCode.PASSWORD_IS_INCORRECT, `Your password is incorrect.`);
     }
 }

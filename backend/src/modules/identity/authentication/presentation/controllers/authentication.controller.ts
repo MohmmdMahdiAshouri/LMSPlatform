@@ -100,7 +100,8 @@ export class AuthenticationController {
         this.authenticationContext.formResponse(res, result.refreshToken);
 
         const frontendUrl = this.configService.get<string>('GOOGLE_LOGIN_SUCCESS_REDIRECT');
-        res.redirect(HttpStatus.FOUND, `${frontendUrl}?accessToken=${result.accessToken}`);
+        // Pass the token via URL fragment — it is never sent to a server and is stripped from Referer
+        res.redirect(HttpStatus.FOUND, `${frontendUrl}#accessToken=${result.accessToken}`);
     }
 
     @Post('refresh-token')

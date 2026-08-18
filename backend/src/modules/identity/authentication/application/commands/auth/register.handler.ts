@@ -10,7 +10,6 @@ import { PASSWORD_HASHER, USER_REPOSITORY } from '../../tokens/injection.token';
 import { Email } from '@modules/identity/authentication/domain/value-objects/email.vo';
 import { Username } from '@modules/identity/authentication/domain/value-objects/username.vo';
 import { Password } from '@modules/identity/authentication/domain/value-objects/password.vo';
-import { PasswordHash } from '@modules/identity/authentication/domain/value-objects/password-hash.vo';
 import { VerificationTokenService } from '../../services/verification-token.service';
 import { Transactional } from '@nestjs-cls/transactional';
 import { AuthenticationService } from '../../services/authentication.service';
@@ -47,8 +46,8 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
         const usernameExists = await this.userRepository.existsByUsername(username);
         if (usernameExists) throw new UsernameAlreadyExistsException(username);
 
-        const hash = await this.passwordHasher.hash(password);
-        const user = User.register(email, username, PasswordHash.create(hash));
+        const passwordHash = await this.passwordHasher.hashToValueObject(password);
+        const user = User.register(email, username, passwordHash);
 
         await this.userRepository.save(user);
         await this.verificationTokenService.create(user);

@@ -2,9 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { EMAIL_QUEUE } from '@shared/queue/queue.constants';
+import { SEND_PASSWORD_RESET_EMAIL_JOB, SEND_VERIFICATION_EMAIL_JOB } from './jobs/send-email.jobs';
+import { EmailProducer } from '../../application/ports/email-producer.port';
 
 @Injectable()
-export class EmailProducer {
+export class BullMQEmailProducer implements EmailProducer {
     constructor(
         @InjectQueue(EMAIL_QUEUE)
         private readonly emailQueue: Queue,
@@ -12,7 +14,7 @@ export class EmailProducer {
 
     async sendVerificationEmail(email: string, username: string, verificationToken: string): Promise<void> {
         await this.emailQueue.add(
-            'send-verification-email',
+            SEND_VERIFICATION_EMAIL_JOB,
             {
                 email,
                 username,
@@ -33,9 +35,9 @@ export class EmailProducer {
         );
     }
 
-    async sendPasswordResetEmail(email: string, passwordResetToken: string) {
+    async sendPasswordResetEmail(email: string, passwordResetToken: string): Promise<void> {
         await this.emailQueue.add(
-            'send-password-reset-email',
+            SEND_PASSWORD_RESET_EMAIL_JOB,
             {
                 email,
                 passwordResetToken,

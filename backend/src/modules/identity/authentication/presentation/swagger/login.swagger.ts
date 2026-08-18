@@ -10,6 +10,11 @@ export function LoginSwagger() {
         }),
 
         ApiResponse({
+            status: 401,
+            description: 'Invalid credentials (unknown user, wrong password, locked or inactive account).',
+        }),
+
+        ApiResponse({
             status: 422,
             description: 'Business validation failed.',
         }),

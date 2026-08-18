@@ -1,5 +1,5 @@
 // infrastructure/persistence/cached-session.repository.ts
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import type Redis from 'ioredis';
 import { SessionRepository } from '../../domain/repositories/session.repository';
 import { Session } from '../../domain/entities/session.entity';
@@ -9,19 +9,21 @@ import { PrismaSessionRepository } from './prisma-session.repository';
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import { SerializedSessionDto } from './dto/serialized-session.dto';
+import { AUTH_CONFIG } from '../../application/config/auth-config';
 
-const SESSION_CACHE_TTL_SECONDS = 60 * 15;
 const cacheKey = (sessionId: string) => `session:${sessionId}`;
 
 @Injectable()
 export class CachedSessionRepository implements SessionRepository {
+    private readonly logger = new Logger(CachedSessionRepository.name);
+
     constructor(
         private readonly prismaSessionRepository: PrismaSessionRepository,
         @Inject(REDIS_CLIENT) private readonly redis: Redis,
     ) {}
 
     async findById(id: string): Promise<Session | null> {
-        const cached = await this.redis.get(cacheKey(id));
+        const cached = await this.safeGet(cacheKey(id));
         if (cached) {
             const session = await this.tryDeserialize(cached, id);
             if (session) return session;
@@ -30,7 +32,7 @@ export class CachedSessionRepository implements SessionRepository {
         const session = await this.prismaSessionRepository.findById(id);
         if (!session) return null;
 
-        await this.redis.set(cacheKey(id), this.serialize(session), 'EX', SESSION_CACHE_TTL_SECONDS);
+        await this.safeSet(cacheKey(id), this.serialize(session));
         return session;
     }
 
@@ -40,12 +42,12 @@ export class CachedSessionRepository implements SessionRepository {
 
     async update(session: Session): Promise<void> {
         await this.prismaSessionRepository.update(session);
-        await this.redis.del(cacheKey(session.getId()));
+        await this.safeDel(cacheKey(session.getId()));
     }
 
     async delete(id: string): Promise<void> {
         await this.prismaSessionRepository.delete(id);
-        await this.redis.del(cacheKey(id));
+        await this.safeDel(cacheKey(id));
     }
 
     async findActiveByUserAndDevice(
@@ -87,7 +89,7 @@ export class CachedSessionRepository implements SessionRepository {
             const errors = validateSync(dto);
 
             if (errors.length > 0) {
-                await this.redis.del(cacheKey(id));
+                await this.safeDel(cacheKey(id));
                 return null;
             }
 
@@ -107,8 +109,33 @@ export class CachedSessionRepository implements SessionRepository {
                 new Date(dto.updatedAt),
             );
         } catch {
-            await this.redis.del(cacheKey(id));
+            await this.safeDel(cacheKey(id));
             return null;
+        }
+    }
+
+    private async safeGet(key: string): Promise<string | null> {
+        try {
+            return await this.redis.get(key);
+        } catch (error) {
+            this.logger.warn(`Redis get failed for ${key}: ${(error as Error).message}`);
+            return null;
+        }
+    }
+
+    private async safeSet(key: string, value: string): Promise<void> {
+        try {
+            await this.redis.set(key, value, 'EX', AUTH_CONFIG.CACHE_TTL_SECONDS);
+        } catch (error) {
+            this.logger.warn(`Redis set failed for ${key}: ${(error as Error).message}`);
+        }
+    }
+
+    private async safeDel(key: string): Promise<void> {
+        try {
+            await this.redis.del(key);
+        } catch (error) {
+            this.logger.warn(`Redis del failed for ${key}: ${(error as Error).message}`);
         }
     }
 }

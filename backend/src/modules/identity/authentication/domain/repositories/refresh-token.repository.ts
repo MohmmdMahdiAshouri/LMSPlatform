@@ -1,7 +1,7 @@
 import { RefreshToken } from '../entities/refresh-token.entity';
 
 export abstract class RefreshTokenRepository {
-    abstract save(refreshToken: RefreshToken, context?: unknown): Promise<void>;
+    abstract save(refreshToken: RefreshToken): Promise<void>;
 
     abstract update(refreshToken: RefreshToken): Promise<void>;
 

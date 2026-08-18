@@ -21,7 +21,7 @@ export class GetCurrentUserHandler implements IQueryHandler<GetCurrentUserQuery>
             email: user.getEmail().getValue(),
             username: user.getUsername().getValue(),
             status: user.getStatus(),
-            emailVerified: user.getEmailVerifiedAt() === null ? false : true,
+            emailVerified: user.isEmailVerified(),
             avatarUrl: user.getAvatarUrl(),
         };
     }

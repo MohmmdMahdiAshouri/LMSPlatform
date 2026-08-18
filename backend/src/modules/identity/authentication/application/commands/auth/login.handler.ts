@@ -3,14 +3,11 @@ import { LoginCommand } from './login.command';
 import { Inject } from '@nestjs/common';
 import { PASSWORD_HASHER, USER_REPOSITORY } from '../../tokens/injection.token';
 import { UserRepository } from '@modules/identity/authentication/domain/repositories/user.repository';
-import { UserNotFoundException } from '@modules/identity/authentication/domain/exceptions/user-not-found.exception';
 import { PasswordHasher } from '../../ports/password-hasher.port';
 import { Password } from '@modules/identity/authentication/domain/value-objects/password.vo';
 import { AuthenticationService } from '../../services/authentication.service';
-import { PasswordIsIncorrectException } from '@modules/identity/authentication/domain/exceptions/password-is-incorrect.exception';
-import { UserInactiveException } from '@modules/identity/authentication/domain/exceptions/user-in-active.exception';
-import { UserLockedException } from '@modules/identity/authentication/domain/exceptions/user-locked.exception';
 import { PasswordLoginNotAvailableException } from '@modules/identity/authentication/domain/exceptions/password-login-not-available.exception';
+import { InvalidCredentialsException } from '@modules/identity/authentication/domain/exceptions/invalid-credentials.exception';
 import { AuthenticationResult } from '../../contracts/authentication-result';
 
 @CommandHandler(LoginCommand)
@@ -27,9 +24,9 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 
     async execute(command: LoginCommand): Promise<AuthenticationResult> {
         //find user
-        const user = await this.userRepository.findByLoginIdentifier(command.emailOrUsername);
+        const user = await this.userRepository.findByLoginIdentifier(this.normalizeIdentifier(command.emailOrUsername));
         if (!user) {
-            throw new UserNotFoundException();
+            throw new InvalidCredentialsException();
         }
 
         //check user password
@@ -41,20 +38,29 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
         if (!isTruePassword) {
             user.recordFailedLogin();
             await this.userRepository.update(user);
-            throw new PasswordIsIncorrectException();
+            throw new InvalidCredentialsException();
         }
 
-        //check user can login
+        //check user can login — failures below are intentionally unified to prevent user enumeration
         if (!user.isActive()) {
-            throw new UserInactiveException();
+            throw new InvalidCredentialsException();
         }
 
         if (user.isLocked()) {
-            throw new UserLockedException(user.getLockedUntil());
+            throw new InvalidCredentialsException();
         }
+
         user.recordSuccessfulLogin();
         await this.userRepository.update(user);
 
         return this.authenticationService.authenticate(user, command.context);
+    }
+
+    private normalizeIdentifier(identifier: string): string {
+        // emails are stored lowercased at registration — normalize login input to match
+        if (identifier.includes('@')) {
+            return identifier.trim().toLowerCase();
+        }
+        return identifier;
     }
 }

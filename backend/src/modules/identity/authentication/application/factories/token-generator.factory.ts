@@ -7,11 +7,10 @@ import {
     TOKEN_HASHER,
 } from '@modules/identity/authentication/application/tokens/injection.token';
 import { Inject, Injectable } from '@nestjs/common';
+import { AUTH_CONFIG } from '../config/auth-config';
 
 @Injectable()
 export class TokenGeneratorFactory {
-    private static readonly EXPIRES_IN_MINUTES = 15;
-
     constructor(
         @Inject(TOKEN_GENERATOR)
         private readonly tokenGenerator: TokenGenerator,
@@ -29,7 +28,7 @@ export class TokenGeneratorFactory {
 
         const now = this.clock.now();
 
-        const expiresAt = new Date(now.getTime() + TokenGeneratorFactory.EXPIRES_IN_MINUTES * 60 * 1000);
+        const expiresAt = new Date(now.getTime() + AUTH_CONFIG.TOKEN_EXPIRES_IN_MINUTES * 60 * 1000);
 
         return { plainToken, tokenHash, expiresAt };
     }

@@ -169,10 +169,6 @@ export class User {
         return this.status === UserStatus.ACTIVE;
     }
 
-    canLogin(): boolean {
-        return this.isActive() && !this.isLocked() && this.isEmailVerified();
-    }
-
     hasPassword(): boolean {
         return this.passwordHash !== null;
     }

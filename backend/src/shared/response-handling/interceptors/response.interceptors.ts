@@ -1,11 +1,11 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
-import { ApiResponse } from '../../common/response-fromat/api-response';
+import { ApiResponse } from '../../common/response-format/api-response';
 import { Reflector } from '@nestjs/core';
 import { DEFAULT_SUCCESS_MESSAGE, NO_WRAP_RESPONSE, RESPONSE_METADATA } from '../constants/response.constants';
 import { ResponseMetadata } from '../interface/response-metadata.interface';
 import { map } from 'rxjs/operators';
 import { Response } from 'express';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class ResponseInterceptor<T> implements NestInterceptor<T, T | ApiResponse<T>> {

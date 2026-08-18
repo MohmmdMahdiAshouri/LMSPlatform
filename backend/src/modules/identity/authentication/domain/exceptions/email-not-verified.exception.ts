@@ -3,6 +3,6 @@ import { BusinessRuleViolationException } from '@shared/error-handling/common/bu
 
 export class EmailNotVerifiedException extends BusinessRuleViolationException {
     constructor() {
-        super(AuthErrorCode.EMAIL_NOT_VERIFIED, `Email not verified yet.`);
+        super(AuthErrorCode.EMAIL_NOT_VERIFIED, 'Please verify your email before logging in.');
     }
 }

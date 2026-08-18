@@ -2,7 +2,7 @@ import { Session } from '../entities/session.entity';
 import { DeviceType } from '../enums/session.enum';
 
 export abstract class SessionRepository {
-    abstract save(session: Session, context?: unknown): Promise<void>;
+    abstract save(session: Session): Promise<void>;
 
     abstract update(session: Session): Promise<void>;
 
