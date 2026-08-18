@@ -14,7 +14,6 @@ import { NotUsablePasswordResetTokenException } from '@modules/identity/authenti
 import { Password } from '@modules/identity/authentication/domain/value-objects/password.vo';
 import { PasswordHasher } from '../../ports/password-hasher.port';
 import { UserNotFoundException } from '@modules/identity/authentication/domain/exceptions/user-not-found.exception';
-import { PasswordHash } from '@modules/identity/authentication/domain/value-objects/password-hash.vo';
 import { Transactional } from '@nestjs-cls/transactional';
 import { AuthenticationService } from '../../services/authentication.service';
 import { PasswordSameAsOldException } from '@modules/identity/authentication/domain/exceptions/password-same-as-old.exception';
@@ -53,9 +52,9 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPasswordComman
             user.hasPassword() && (await this.passwordHasher.compare(newPassword, user.getPasswordHash()!));
         if (isSamePassword) throw new PasswordSameAsOldException();
 
-        const hash = await this.passwordHasher.hash(newPassword);
+        const passwordHash = await this.passwordHasher.hashToValueObject(newPassword);
 
-        user.changePassword(PasswordHash.create(hash));
+        user.changePassword(passwordHash);
         resetPasswordToken.use();
         resetPasswordToken.revoke();
 

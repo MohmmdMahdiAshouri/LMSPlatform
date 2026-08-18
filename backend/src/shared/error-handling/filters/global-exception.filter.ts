@@ -8,7 +8,7 @@ import { UnauthorizedError } from '../common/unauthorized.error';
 import { ForbiddenError } from '../common/forbidden.error';
 import { ConflictError } from '../common/conflict.error';
 import { InfrastructureError } from '../base/infrastructure.error';
-import { ApiResponse } from '@shared/common/response-fromat/api-response';
+import { ApiResponse } from '@shared/common/response-format/api-response';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -23,7 +23,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         const { statusCode, code, message, details } = this.resolve(exception);
 
         if (exception instanceof BaseError && exception.isOperational) {
-            this.logger.warn(`[${correlationId}] ${code}: ${message}`, JSON.stringify(exception.metadata ?? {}));
+            this.logger.warn(`[${correlationId}] ${code}: ${message}`);
         } else {
             this.logger.error(
                 `[${correlationId}] Unhandled/Infra error: ${message}`,

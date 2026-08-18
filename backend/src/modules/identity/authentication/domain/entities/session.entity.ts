@@ -15,7 +15,7 @@ export class Session {
         private expiresAt: Date,
         private revokedAt: Date | null,
         private readonly createdAt: Date,
-        private readonly updatedAt: Date,
+        private updatedAt: Date,
     ) {}
 
     static restore(
@@ -82,17 +82,24 @@ export class Session {
 
         this.status = SessionStatus.REVOKED;
         this.revokedAt = new Date();
+        this.touch();
     }
 
     expire(): void {
         if (this.isExpired()) return;
 
         this.status = SessionStatus.EXPIRED;
+        this.touch();
     }
 
     refreshActivity(lastActivityAt: Date, expiresAt: Date): void {
         this.lastActivityAt = lastActivityAt;
         this.expiresAt = expiresAt;
+        this.touch();
+    }
+
+    private touch(): void {
+        this.updatedAt = new Date();
     }
 
     isActive(): boolean {

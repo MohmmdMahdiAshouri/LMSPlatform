@@ -1,4 +1,3 @@
-// src/shared/infrastructure/outbox/outbox-processor.service.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { EventBus } from '@nestjs/cqrs';
@@ -6,22 +5,18 @@ import { Inject } from '@nestjs/common';
 import { Transactional } from '@nestjs-cls/transactional';
 import type { OutboxMessageRepository } from '../application/outbox-message.repository';
 import { OUTBOX_REPOSITORY } from '../domain/injection.token';
-import { VerificationTokenEvent } from '@modules/identity/authentication/application/events/verification-token.event';
-
-const EVENT_MAP: Record<string, (payload: Record<string, unknown>) => object> = {
-    VerificationTokenEvent: (payload) => {
-        const p = payload as unknown as VerificationTokenEvent;
-        return new VerificationTokenEvent(p.userId, p.email, p.username, p.verificationToken);
-    },
-};
+import { OUTBOX_EVENT_FACTORIES, OutboxEventFactory } from '../domain/outbox-event-factory';
 
 @Injectable()
 export class OutboxProcessorService {
+    private static readonly MAX_ATTEMPTS = 5;
     private readonly logger = new Logger(OutboxProcessorService.name);
 
     constructor(
         @Inject(OUTBOX_REPOSITORY)
         private readonly outboxRepository: OutboxMessageRepository,
+        @Inject(OUTBOX_EVENT_FACTORIES)
+        private readonly eventFactories: OutboxEventFactory[],
         private readonly eventBus: EventBus,
     ) {}
 
@@ -32,17 +27,29 @@ export class OutboxProcessorService {
 
         for (const message of messages) {
             try {
-                const eventFactory = EVENT_MAP[message.getEventType()];
+                const eventFactory = this.eventFactories.find(
+                    (factory) => factory.eventType === message.getEventType(),
+                );
+
                 if (!eventFactory) {
-                    this.logger.warn(`Unknown event type: ${message.getEventType()}`);
+                    this.logger.warn(
+                        `Unknown event type '${message.getEventType()}' — discarding outbox message ${message.getId()}`,
+                    );
+                    await this.outboxRepository.markProcessed(message.getId());
                     continue;
                 }
 
-                this.eventBus.publish(eventFactory(message.getPayload()));
+                this.eventBus.publish(eventFactory.create(message.getPayload()));
                 await this.outboxRepository.markProcessed(message.getId());
             } catch (error) {
                 await this.outboxRepository.incrementAttempts(message.getId(), (error as Error).message);
-                this.logger.error(`Failed to process outbox message ${message.getId()}`, error);
+
+                if (message.getAttempts() + 1 >= OutboxProcessorService.MAX_ATTEMPTS) {
+                    this.logger.error(`Outbox message ${message.getId()} exceeded max attempts — discarding`, error);
+                    await this.outboxRepository.markProcessed(message.getId());
+                } else {
+                    this.logger.error(`Failed to process outbox message ${message.getId()}`, error);
+                }
             }
         }
     }

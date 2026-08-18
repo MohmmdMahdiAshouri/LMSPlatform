@@ -7,6 +7,7 @@ import { TokenGeneratorFactory } from '../factories/token-generator.factory';
 import { OutboxMessage } from '@shared/common/domain/outbox-message.entity';
 import type { OutboxMessageRepository } from '@shared/common/application/outbox-message.repository';
 import { OUTBOX_REPOSITORY } from '@shared/common/domain/injection.token';
+import { VerificationTokenEvent } from '../events/verification-token.event';
 
 @Injectable()
 export class VerificationTokenService {
@@ -27,7 +28,7 @@ export class VerificationTokenService {
 
         await this.verificationTokenRepository.save(verificationToken);
 
-        const outboxMessage = OutboxMessage.create('VerificationTokenEvent', {
+        const outboxMessage = OutboxMessage.create(VerificationTokenEvent.TYPE, {
             userId: user.getId(),
             email: user.getEmail().getValue(),
             username: user.getUsername().getValue(),

@@ -20,7 +20,7 @@ export function GoogleCallbackSwagger() {
         ApiOperation({
             summary: 'Google OAuth callback',
             description:
-                'Handles the Google redirect, registers a new user if the Google account is not linked to any existing account (or logs the existing user in), sets the refresh token cookie, and redirects to the frontend with an accessToken query parameter.',
+                'Handles the Google redirect, registers a new user if the Google account is not linked to any existing account (or logs the existing user in), sets the refresh token cookie, and redirects to the frontend with an accessToken URL fragment.',
         }),
         ApiResponse({
             status: 302,

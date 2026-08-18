@@ -13,9 +13,10 @@ import {
     USER_REPOSITORY,
     VERIFICATION_TOKEN_REPOSITORY,
 } from './application/tokens/injection.token';
+import { AuthenticationEmailModule } from './infrastructure/email/email.module';
 import { RegisterHandler } from './application/commands/auth/register.handler';
 import { BcryptPasswordHasher } from './infrastructure/security/bcrypt-password-hasher';
-import { UserRegisteredEventHandler } from './application/event-handlers/verification-token.event.handler';
+import { VerificationTokenEventHandler } from './application/event-handlers/verification-token.event.handler';
 import { TokenGeneratorFactory } from './application/factories/token-generator.factory';
 import { VerificationTokenService } from './application/services/verification-token.service';
 import { SystemClock } from './infrastructure/security/system-clock';
@@ -56,16 +57,21 @@ import { GetCurrentUserHandler } from './application/queries/me/get-current-user
 import { GetActiveSessionsHandler } from './application/queries/sessions/get-active-sessions.handler';
 import { GoogleLoginHandler } from './application/commands/auth/google-login.handler';
 import { GoogleStrategy } from './infrastructure/security/google.strategy';
+import { PasswordResetTokenEventHandler } from './application/event-handlers/password-reset-token.event.handler';
+import { OUTBOX_EVENT_FACTORIES } from '@shared/common/domain/outbox-event-factory';
+import { AUTH_OUTBOX_EVENT_FACTORIES } from './application/events/outbox-event-factories';
+import { AUTH_CONFIG } from './application/config/auth-config';
 @Module({
     imports: [
         CqrsModule,
+        AuthenticationEmailModule,
         JwtModule.registerAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => ({
-                secret: configService.get<string>('JWT_ACCESS_SECRET'),
+                secret: configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
                 signOptions: {
-                    expiresIn: '15m',
+                    expiresIn: `${AUTH_CONFIG.ACCESS_TOKEN_EXPIRES_IN_MINUTES}m`,
                 },
             }),
         }),
@@ -77,7 +83,8 @@ import { GoogleStrategy } from './infrastructure/security/google.strategy';
         VerifyEmailHandler,
         TokenGeneratorFactory,
         VerificationTokenService,
-        UserRegisteredEventHandler,
+        VerificationTokenEventHandler,
+        PasswordResetTokenEventHandler,
         AuthenticationService,
         AuthenticationContextMapper,
         LoginHandler,
@@ -135,8 +142,9 @@ import { GoogleStrategy } from './infrastructure/security/google.strategy';
             useClass: JwtTokenGenerator,
         },
         { provide: OUTBOX_REPOSITORY, useClass: PrismaOutboxRepository },
+        { provide: OUTBOX_EVENT_FACTORIES, useValue: AUTH_OUTBOX_EVENT_FACTORIES },
         { provide: APP_GUARD, useClass: JwtAuthGuard },
     ],
-    exports: [AccessTokenGenerator, SESSION_REPOSITORY, REFRESH_TOKEN_REPOSITORY],
+    exports: [AccessTokenGenerator, SESSION_REPOSITORY, REFRESH_TOKEN_REPOSITORY, OUTBOX_EVENT_FACTORIES],
 })
 export class AuthenticationModule {}

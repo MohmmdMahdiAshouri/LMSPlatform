@@ -11,7 +11,7 @@ import { AuthenticationContextMapper } from '../mappers/authentication-context.m
 import { LogoutAllDevicesCommand } from '../../application/commands/session/logout-all-devices.command';
 import { LogoutAllDevicesSwagger } from '../swagger/logout-all-devices.swagger';
 import { LogoutSpecificDeviceCommand } from '../../application/commands/session/logout-specific-device.command';
-import { LogoutSpecificDeviceSwagger } from '../swagger/logout.specific-device.swagger';
+import { LogoutSpecificDeviceSwagger } from '../swagger/logout-specific-device.swagger';
 import { GetActiveSessionsQuery } from '../../application/queries/sessions/get-active-sessions.query';
 import { GetActiveSessionsSwagger } from '../swagger/get-active-sessions.swagger';
 

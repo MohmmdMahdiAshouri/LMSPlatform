@@ -4,12 +4,16 @@ import { PASSWORD_RESET_TOKEN_REPOSITORY, USER_REPOSITORY } from '../../tokens/i
 import { UserRepository } from '@modules/identity/authentication/domain/repositories/user.repository';
 import { Inject } from '@nestjs/common';
 import { Email } from '@modules/identity/authentication/domain/value-objects/email.vo';
-import { UserNotFoundException } from '@modules/identity/authentication/domain/exceptions/user-not-found.exception';
 import { TokenGeneratorFactory } from '../../factories/token-generator.factory';
 import { PasswordResetToken } from '@modules/identity/authentication/domain/entities/password-reset-token.entity';
 import { PasswordResetTokenRepository } from '@modules/identity/authentication/domain/repositories/password-reset-token.repository';
-import { EmailProducer } from '../../producers/email.producer';
 import { Transactional } from '@nestjs-cls/transactional';
+import { OutboxMessage } from '@shared/common/domain/outbox-message.entity';
+import type { OutboxMessageRepository } from '@shared/common/application/outbox-message.repository';
+import { OUTBOX_REPOSITORY } from '@shared/common/domain/injection.token';
+import { PasswordResetTokenEvent } from '../../events/password-reset-token.event';
+import { AUTH_CONFIG } from '../../config/auth-config';
+import { UserNotFoundException } from '@modules/identity/authentication/domain/exceptions/user-not-found.exception';
 import { PasswordResetTokenTooSoonException } from '@modules/identity/authentication/domain/exceptions/password-reset-token-too-soon.exception';
 
 @CommandHandler(ForgotPasswordCommand)
@@ -23,8 +27,10 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPasswordComm
         @Inject(PASSWORD_RESET_TOKEN_REPOSITORY)
         private readonly passwordResetTokenRepository: PasswordResetTokenRepository,
 
-        private readonly emailProducer: EmailProducer,
+        @Inject(OUTBOX_REPOSITORY)
+        private readonly outboxRepository: OutboxMessageRepository,
     ) {}
+
     @Transactional()
     async execute(command: ForgotPasswordCommand): Promise<void> {
         //find user
@@ -34,10 +40,10 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPasswordComm
             throw new UserNotFoundException();
         }
 
-        //revoke perevious token
+        //revoke previous token
         const oldPasswordResetToken = await this.passwordResetTokenRepository.findActiveByUserId(user.getId());
         if (oldPasswordResetToken) {
-            if (Date.now() - oldPasswordResetToken.getCreatedAt().getTime() < 1000 * 60 * 2) {
+            if (Date.now() - oldPasswordResetToken.getCreatedAt().getTime() < AUTH_CONFIG.RESEND_COOLDOWN_MS) {
                 throw new PasswordResetTokenTooSoonException();
             }
             oldPasswordResetToken.revoke();
@@ -53,7 +59,11 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPasswordComm
         //save token
         await this.passwordResetTokenRepository.save(passwordResetToken);
 
-        //send email
-        await this.emailProducer.sendPasswordResetEmail(email.getValue(), plainToken);
+        //enqueue email delivery through the outbox (same transaction)
+        const outboxMessage = OutboxMessage.create(PasswordResetTokenEvent.TYPE, {
+            email: email.getValue(),
+            passwordResetToken: plainToken,
+        });
+        await this.outboxRepository.save(outboxMessage);
     }
 }

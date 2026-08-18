@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -15,8 +16,9 @@ async function bootstrap() {
 
     app.use(cookieParser());
 
+    const configService = app.get(ConfigService);
     app.enableCors({
-        origin: 'http://localhost:3000',
+        origin: configService.get<string>('CORS_ORIGIN') ?? 'http://localhost:3000',
         credentials: true,
     });
 

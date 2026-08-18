@@ -12,6 +12,10 @@ export class BcryptPasswordHasher implements PasswordHasher {
         return bcrypt.hash(password.getValue(), BcryptPasswordHasher.SALT_ROUNDS);
     }
 
+    async hashToValueObject(password: Password): Promise<PasswordHash> {
+        return PasswordHash.create(await this.hash(password));
+    }
+
     compare(plain: Password, hashed: PasswordHash): Promise<boolean> {
         return bcrypt.compare(plain.getValue(), hashed.getValue());
     }
