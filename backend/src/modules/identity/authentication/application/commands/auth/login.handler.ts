@@ -9,6 +9,8 @@ import { AuthenticationService } from '../../services/authentication.service';
 import { PasswordLoginNotAvailableException } from '@modules/identity/authentication/domain/exceptions/password-login-not-available.exception';
 import { InvalidCredentialsException } from '@modules/identity/authentication/domain/exceptions/invalid-credentials.exception';
 import { AuthenticationResult } from '../../contracts/authentication-result';
+import { UserLockedException } from '@modules/identity/authentication/domain/exceptions/user-locked.exception';
+import { UserInactiveException } from '@modules/identity/authentication/domain/exceptions/user-in-active.exception';
 
 @CommandHandler(LoginCommand)
 export class LoginHandler implements ICommandHandler<LoginCommand> {
@@ -43,11 +45,11 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 
         //check user can login — failures below are intentionally unified to prevent user enumeration
         if (!user.isActive()) {
-            throw new InvalidCredentialsException();
+            throw new UserInactiveException();
         }
 
         if (user.isLocked()) {
-            throw new InvalidCredentialsException();
+            throw new UserLockedException(user.getLockedUntil());
         }
 
         user.recordSuccessfulLogin();

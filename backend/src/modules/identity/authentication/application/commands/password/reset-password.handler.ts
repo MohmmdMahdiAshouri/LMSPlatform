@@ -56,7 +56,6 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPasswordComman
 
         user.changePassword(passwordHash);
         resetPasswordToken.use();
-        resetPasswordToken.revoke();
 
         await this.userRepository.update(user);
         await this.passwordResetTokenRepository.update(resetPasswordToken);
