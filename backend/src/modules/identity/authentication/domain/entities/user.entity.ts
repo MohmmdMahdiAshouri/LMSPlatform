@@ -69,7 +69,7 @@ export class User {
             UserStatus.ACTIVE,
             0,
             null,
-            null,
+            now,
             now,
             now,
         );
