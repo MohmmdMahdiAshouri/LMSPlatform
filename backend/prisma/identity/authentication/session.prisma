@@ -1,34 +1,34 @@
 enum SessionStatus {
-    ACTIVE
-    REVOKED
-    EXPIRED
+  ACTIVE
+  REVOKED
+  EXPIRED
 }
 
 enum DeviceType {
-    DESKTOP
-    MOBILE
-    TABLET
-    UNKNOWN
+  DESKTOP
+  MOBILE
+  TABLET
+  UNKNOWN
 }
 
 model Session {
-    id              String        @id @default(uuid()) @db.Uuid
-    userId          String        @db.Uuid
-    status          SessionStatus @default(ACTIVE)
-    deviceType      DeviceType    @default(UNKNOWN)
-    browser         String        @db.VarChar(100)
-    operatingSystem String        @db.VarChar(100)
-    ipAddress       String        @db.Inet
-    userAgent       String        @db.Text
-    lastActivityAt  DateTime      @db.Timestamptz(6)
-    expiresAt       DateTime      @db.Timestamptz(6)
-    revokedAt       DateTime?     @db.Timestamptz(6)
-    createdAt       DateTime      @default(now()) @db.Timestamptz(6)
-    updatedAt       DateTime      @updatedAt @db.Timestamptz(6)
+  id              String        @id @default(uuid()) @db.Uuid
+  userId          String        @db.Uuid
+  status          SessionStatus @default(ACTIVE)
+  deviceType      DeviceType    @default(UNKNOWN)
+  browser         String        @db.VarChar(100)
+  operatingSystem String        @db.VarChar(100)
+  ipAddress       String        @db.Inet
+  userAgent       String        @db.Text
+  lastActivityAt  DateTime      @db.Timestamptz(6)
+  expiresAt       DateTime      @db.Timestamptz(6)
+  revokedAt       DateTime?     @db.Timestamptz(6)
+  createdAt       DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime      @updatedAt @db.Timestamptz(6)
 
-    user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-    refreshToken RefreshToken?
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken RefreshToken?
 
-    @@index([userId], name: "idx_session_user_id")
-    @@index([status], name: "idx_session_status")
+  @@index([userId], name: "idx_session_user_id")
+  @@index([status], name: "idx_session_status")
 }

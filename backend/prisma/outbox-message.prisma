@@ -1,12 +1,12 @@
 model OutboxMessage {
-    id          String    @id @default(uuid())
-    eventType   String    @map("event_type")
-    payload     Json
-    createdAt   DateTime  @default(now()) @map("created_at")
-    processedAt DateTime? @map("processed_at")
-    attempts    Int       @default(0)
-    lastError   String?   @map("last_error")
+  id          String    @id @default(uuid())
+  eventType   String    @map("event_type")
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at")
+  processedAt DateTime? @map("processed_at")
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
 
-    @@index([processedAt])
-    @@map("outbox_messages")
+  @@index([processedAt])
+  @@map("outbox_messages")
 }
