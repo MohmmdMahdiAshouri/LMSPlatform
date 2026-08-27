@@ -1,0 +1,33 @@
+enum ApprovalRequestType {
+  ROLE_CREATE
+  ROLE_UPDATE
+  ROLE_DELETE
+  ROLE_ASSIGN
+  ROLE_CHANGE
+  ROLE_REMOVE
+}
+
+enum ApprovalRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FAILED
+}
+
+model ApprovalRequest {
+  id            String                @id @default(uuid()) @db.Uuid
+  schoolId      String                @db.Uuid
+  requestedBy   String                @db.Uuid
+  type          ApprovalRequestType
+  payload       Json
+  status        ApprovalRequestStatus @default(PENDING)
+  reviewedBy    String?               @db.Uuid
+  reviewedAt    DateTime?             @db.Timestamptz(6)
+  failureReason String?               @db.VarChar(1000)
+  createdAt     DateTime              @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime              @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@index([schoolId], name: "idx_approval_request_school_id")
+  @@index([status], name: "idx_approval_request_status")
+  @@index([requestedBy], name: "idx_approval_request_requested_by")
+}

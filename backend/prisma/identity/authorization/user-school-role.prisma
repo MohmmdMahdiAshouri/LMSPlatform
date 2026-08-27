@@ -1,0 +1,14 @@
+model UserSchoolRole {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  schoolId  String   @db.Uuid
+  roleId    String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, schoolId], name: "idx_user_school_role_user_school")
+  @@index([schoolId], name: "idx_user_school_role_school_id")
+  @@index([roleId], name: "idx_user_school_role_role_id")
+}
