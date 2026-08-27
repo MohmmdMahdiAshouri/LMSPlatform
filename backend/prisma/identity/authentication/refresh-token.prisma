@@ -1,11 +1,11 @@
 model RefreshToken {
-    id        String    @id @default(uuid()) @db.Uuid
-    sessionId String    @unique @db.Uuid
-    tokenHash String    @db.VarChar(255)
-    expiresAt DateTime  @db.Timestamptz(6)
-    revokedAt DateTime? @db.Timestamptz(6)
-    createdAt DateTime  @default(now()) @db.Timestamptz(6)
-    session   Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  id        String    @id @default(uuid()) @db.Uuid
+  sessionId String    @unique @db.Uuid
+  tokenHash String    @db.VarChar(255)
+  expiresAt DateTime  @db.Timestamptz(6)
+  revokedAt DateTime? @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  session   Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
-    @@index([expiresAt], name: "idx_refresh_token_expires_at")
+  @@index([expiresAt], name: "idx_refresh_token_expires_at")
 }
