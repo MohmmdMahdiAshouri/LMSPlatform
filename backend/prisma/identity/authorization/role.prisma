@@ -1,0 +1,14 @@
+model Role {
+  id        String   @id @default(uuid()) @db.Uuid
+  schoolId  String   @db.Uuid
+  name      String   @db.VarChar(100)
+  isSystem  Boolean  @default(false)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  permissions     RolePermission[]
+  userSchoolRoles UserSchoolRole[]
+
+  @@unique([schoolId, name], name: "idx_role_school_name")
+  @@index([schoolId], name: "idx_role_school_id")
+}

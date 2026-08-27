@@ -1,0 +1,16 @@
+enum CourseRole {
+  INSTRUCTOR
+  ASSISTANT
+}
+
+model CourseMembership {
+  id         String     @id @default(uuid()) @db.Uuid
+  userId     String     @db.Uuid
+  courseId   String     @db.Uuid
+  courseRole CourseRole
+  assignedBy String     @db.Uuid
+  createdAt  DateTime   @default(now()) @db.Timestamptz(6)
+
+  @@unique([userId, courseId], name: "idx_course_membership_user_course")
+  @@index([courseId], name: "idx_course_membership_course_id")
+}
