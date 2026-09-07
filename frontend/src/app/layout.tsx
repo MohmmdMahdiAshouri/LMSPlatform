@@ -1,0 +1,47 @@
+import type { Metadata } from 'next';
+import localFont from 'next/font/local';
+import './globals.css';
+import { cn } from '@/shared/lib/utils';
+import { TanstackProvider } from './Tanstack.provider';
+
+export const metadata: Metadata = {
+    title: 'LMS Platform',
+    description: 'A Learning Management System Platform',
+};
+
+
+const vazir = localFont({
+    src: [
+        {
+            path: '../../public/font/vazir/Vazir-Regular-FD.woff2',
+            weight: '400',
+            style: 'normal',
+        },
+        {
+            path: '../../public/font/vazir/Vazir-Black-FD.woff2',
+            weight: '700',
+            style: 'normal',
+        },
+    ],
+    variable: '--font-vazir',
+});
+
+export default function RootLayout({
+    children,
+}: Readonly<{
+    children: React.ReactNode;
+}>) {
+    return (
+        <html
+            dir="rtl"
+            lang="fa"
+            className={cn('h-full antialiased', vazir.variable)}
+        >
+            <body className="min-h-full flex flex-col">
+                <TanstackProvider>
+                    {children}
+                </TanstackProvider>
+            </body>
+        </html>
+    );
+}
