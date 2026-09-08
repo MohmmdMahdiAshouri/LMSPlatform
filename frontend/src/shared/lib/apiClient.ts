@@ -3,6 +3,7 @@ import type { AxiosError, InternalAxiosRequestConfig } from "axios";
 
 export const apiClient = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
+    withCredentials: true,
     headers: { "Content-Type": "application/json" },
 });
 
@@ -24,7 +25,7 @@ function processQueue(error: unknown, token: string | null) {
 }
 
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-    const token = "accessToken"; // useAuthStore.getState().accessToken; // اینجا باید accessToken واقعی از store گرفته شود
+    const token = null; // useAuthStore.getState().accessToken; // اینجا باید accessToken واقعی از store گرفته شود
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -44,7 +45,7 @@ apiClient.interceptors.response.use(
 
         if (originalRequest.url === "/auth/refresh-token") {
             // useAuthStore.getState().logout();
-            window.location.href = "/login";
+            window.location.href = '/signin'
             return Promise.reject(error);
         }
 
@@ -77,7 +78,7 @@ apiClient.interceptors.response.use(
         } catch (refreshError) {
             processQueue(refreshError, null);
             // useAuthStore.getState().logout();
-            window.location.href = "/login";
+            window.location.href = '/signin';
             return Promise.reject(refreshError);
         } finally {
             isRefreshing = false;

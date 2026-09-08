@@ -4,23 +4,22 @@ import {
     signupFormSchema,
     signupFormDefaultValues,
     type SignupFormValues,
-} from '../schemas/signup.schema';
+} from '../../schemas/signup.schema';
 
 export function SignupForm({
     onSubmit,
 }: {
     onSubmit: (values: SignupFormValues) => Promise<void> | void;
 }) {
-    const { handleSubmit, AppField, SubmitButton, AppForm } =
-        useAppForm({
-            defaultValues: signupFormDefaultValues,
-            validators: {
-                onChange: signupFormSchema,
-            },
-            onSubmit: async ({ value }) => {
-                await onSubmit(value);
-            },
-        });
+    const { handleSubmit, AppField, SubmitButton, AppForm } = useAppForm({
+        defaultValues: signupFormDefaultValues,
+        validators: {
+            onChange: signupFormSchema,
+        },
+        onSubmit: async ({ value }) => {
+            await onSubmit(value);
+        },
+    });
 
     return (
         <div className="w-full h-screen flex items-center justify-center">
@@ -54,14 +53,12 @@ export function SignupForm({
 
                 <AppField name="password">
                     {(field) => (
-                        <>
-                            <field.TextField
-                                type="password"
-                                label="رمز عبور"
-                                placeholder="Password123!"
-                                dir="ltr"
-                            />
-                        </>
+                        <field.TextField
+                            type="password"
+                            label="رمز عبور"
+                            placeholder="Password123!"
+                            dir="ltr"
+                        />
                     )}
                 </AppField>
 

@@ -1,8 +1,5 @@
 import { z } from 'zod';
-
-const USERNAME_REGEX = /^(?=.{3,30}$)(?!.*__)[a-zA-Z][a-zA-Z0-9_]*[a-zA-Z0-9]$/;
-const PASSWORD_REGEX =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[ !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~])[A-Za-z\d !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]{8,64}$/;
+import { PASSWORD_REGEX, USERNAME_REGEX } from '../constants/authentication.constant';
 
 export const signupFormSchema = z
     .object({
