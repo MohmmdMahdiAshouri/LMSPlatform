@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
 import { cn } from '@/shared/lib/utils';
-import { TanstackProvider } from './Tanstack.provider';
+import { Providers } from './Providers';
 
 export const metadata: Metadata = {
     title: 'LMS Platform',
@@ -38,9 +38,9 @@ export default function RootLayout({
             className={cn('h-full antialiased', vazir.variable)}
         >
             <body className="min-h-full flex flex-col">
-                <TanstackProvider>
+                <Providers>
                     {children}
-                </TanstackProvider>
+                </Providers>
             </body>
         </html>
     );

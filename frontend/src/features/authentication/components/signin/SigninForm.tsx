@@ -4,22 +4,24 @@ import {
     signinFormSchema,
     SigninFormValues,
 } from '../../schemas/signin.schema';
+import { ForgotPassword } from './ForgotPassword';
 
 export function SigninForm({
     onSubmit,
 }: {
     onSubmit: (value: SigninFormValues) => Promise<void> | void;
 }) {
-    const { handleSubmit, AppField, AppForm, SubmitButton, reset } = useAppForm({
-        defaultValues: signinFormDefaultValues,
-        validators: {
-            onChange: signinFormSchema,
+    const { handleSubmit, AppField, AppForm, SubmitButton } = useAppForm(
+        {
+            defaultValues: signinFormDefaultValues,
+            validators: {
+                onChange: signinFormSchema,
+            },
+            onSubmit: async ({ value }) => {
+                await onSubmit(value);
+            },
         },
-        onSubmit: async ({ value }) => {
-            await onSubmit(value);
-            // reset()
-        },
-    });
+    );
 
     return (
         <div className="w-full h-screen flex items-center justify-center">
@@ -58,6 +60,8 @@ export function SigninForm({
                         <SubmitButton>ورود</SubmitButton>
                     </div>
                 </AppForm>
+
+                <ForgotPassword />
             </form>
         </div>
     );
