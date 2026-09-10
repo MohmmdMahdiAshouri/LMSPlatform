@@ -9,8 +9,8 @@ export function useSignup() {
             const { confirmPassword, ...payload } = values;
             return signupService(payload);
         },
-        onSuccess: (data) => {
-            alert(data.accessToken);
+        onSuccess: (res) => {
+            alert(res.data?.accessToken);
         },
         onError: (error) => {
             alert(getErrorMessage(error));

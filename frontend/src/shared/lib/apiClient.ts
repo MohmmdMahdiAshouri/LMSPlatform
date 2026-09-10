@@ -1,11 +1,43 @@
-import axios from "axios";
-import type { AxiosError, InternalAxiosRequestConfig } from "axios";
+import axios from 'axios';
+import type {
+    AxiosError,
+    AxiosInstance,
+    AxiosRequestConfig,
+    InternalAxiosRequestConfig,
+} from 'axios';
+import { ApiResponse } from './apiResponse.type';
 
-export const apiClient = axios.create({
+type ApiClient = Omit<AxiosInstance, 'get' | 'post' | 'put' | 'patch' | 'delete'> & {
+    <T = unknown>(config: AxiosRequestConfig): Promise<ApiResponse<T>>;
+
+    get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>>;
+    
+    post<T = unknown>(
+        url: string,
+        data?: unknown,
+        config?: AxiosRequestConfig,
+    ): Promise<ApiResponse<T>>;
+    
+    put<T = unknown>(
+        url: string,
+        data?: unknown,
+        config?: AxiosRequestConfig,
+    ): Promise<ApiResponse<T>>;
+    
+    patch<T = unknown>(
+        url: string,
+        data?: unknown,
+        config?: AxiosRequestConfig,
+    ): Promise<ApiResponse<T>>;
+    
+    delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>>;
+};
+
+export const apiClient: ApiClient = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
     withCredentials: true,
-    headers: { "Content-Type": "application/json" },
-});
+    headers: { 'Content-Type': 'application/json' },
+}) ;
 
 let isRefreshing = false;
 let failedQueue: Array<{
@@ -43,9 +75,9 @@ apiClient.interceptors.response.use(
             return Promise.reject(error);
         }
 
-        if (originalRequest.url === "/auth/refresh-token") {
+        if (originalRequest.url === '/auth/refresh-token') {
             // useAuthStore.getState().logout();
-            window.location.href = '/signin'
+            window.location.href = '/signin';
             return Promise.reject(error);
         }
 
