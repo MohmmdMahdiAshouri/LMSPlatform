@@ -7,37 +7,46 @@ import type {
 } from 'axios';
 import { ApiResponse } from './apiResponse.type';
 
-type ApiClient = Omit<AxiosInstance, 'get' | 'post' | 'put' | 'patch' | 'delete'> & {
+type ApiClient = Omit<
+    AxiosInstance,
+    'get' | 'post' | 'put' | 'patch' | 'delete'
+> & {
     <T = unknown>(config: AxiosRequestConfig): Promise<ApiResponse<T>>;
 
-    get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>>;
-    
+    get<T = unknown>(
+        url: string,
+        config?: AxiosRequestConfig,
+    ): Promise<ApiResponse<T>>;
+
     post<T = unknown>(
         url: string,
         data?: unknown,
         config?: AxiosRequestConfig,
     ): Promise<ApiResponse<T>>;
-    
+
     put<T = unknown>(
         url: string,
         data?: unknown,
         config?: AxiosRequestConfig,
     ): Promise<ApiResponse<T>>;
-    
+
     patch<T = unknown>(
         url: string,
         data?: unknown,
         config?: AxiosRequestConfig,
     ): Promise<ApiResponse<T>>;
-    
-    delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>>;
+
+    delete<T = unknown>(
+        url: string,
+        config?: AxiosRequestConfig,
+    ): Promise<ApiResponse<T>>;
 };
 
 export const apiClient: ApiClient = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
     withCredentials: true,
     headers: { 'Content-Type': 'application/json' },
-}) ;
+});
 
 let isRefreshing = false;
 let failedQueue: Array<{
@@ -77,7 +86,7 @@ apiClient.interceptors.response.use(
 
         if (originalRequest.url === '/auth/refresh-token') {
             // useAuthStore.getState().logout();
-            window.location.href = '/signin';
+            window.location.href = '/signIn';
             return Promise.reject(error);
         }
 
@@ -110,7 +119,7 @@ apiClient.interceptors.response.use(
         } catch (refreshError) {
             processQueue(refreshError, null);
             // useAuthStore.getState().logout();
-            window.location.href = '/signin';
+            window.location.href = '/signIn';
             return Promise.reject(refreshError);
         } finally {
             isRefreshing = false;

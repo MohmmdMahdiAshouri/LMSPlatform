@@ -58,7 +58,7 @@ function AlertDialogContent({
                 data-slot="alert-dialog-content"
                 data-size={size}
                 className={cn(
-                    'group/alert-dialog-content fixed top-1/2 start-1/2 z-50 grid w-full -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none data-[size=default]:max-w-xs data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
+                    'group/alert-dialog-content bg-foreground! text-primary-foreground! fixed top-1/2 inset-s-1/2 z-50 grid w-full -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 ring-1 ring-foreground/10 duration-100 outline-none data-[size=default]:max-w-xs data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
                     className,
                 )}
                 {...props}
@@ -154,7 +154,7 @@ function AlertDialogAction({
     return (
         <Button
             data-slot="alert-dialog-action"
-            className={cn(className)}
+            className={cn(className, 'cursor-pointer')}
             {...props}
         />
     );
@@ -170,7 +170,7 @@ function AlertDialogCancel({
     return (
         <AlertDialogPrimitive.Close
             data-slot="alert-dialog-cancel"
-            className={cn(className)}
+            className={cn(className, 'text-foreground cursor-pointer')}
             render={<Button variant={variant} size={size} />}
             {...props}
         />

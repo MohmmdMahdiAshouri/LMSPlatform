@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
 import { cn } from '@/shared/lib/utils';
-import { Providers } from './Providers';
+import { Providers } from '../shared/components/layout/Providers';
+import { AppContainer } from '@/shared/components/layout/AppContainer';
 
 export const metadata: Metadata = {
     title: 'LMS Platform',
@@ -37,10 +38,12 @@ export default function RootLayout({
             lang="fa"
             className={cn('h-full antialiased', vazir.variable)}
         >
-            <body className="min-h-full flex flex-col">
-                <Providers>
-                    {children}
-                </Providers>
+            <body className="min-h-full min-w-full flex flex-col">
+                <AppContainer>
+                    <Providers>
+                        {children}
+                    </Providers>
+                </AppContainer>
             </body>
         </html>
     );
