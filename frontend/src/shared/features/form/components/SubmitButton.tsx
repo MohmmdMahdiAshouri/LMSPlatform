@@ -5,8 +5,9 @@ import type { ReactNode } from 'react';
 
 export function SubmitButton({
     children,
+    isLoading,
     ...props
-}: ButtonProps & { children: ReactNode }) {
+}: ButtonProps & { children: ReactNode, isLoading: boolean }) {
     const {Subscribe} = useFormContext();
 
     return (
@@ -14,12 +15,10 @@ export function SubmitButton({
             {([canSubmit, isSubmitting]) => (
                 <Button
                     type="submit"
-                    disabled={!canSubmit || isSubmitting}
+                    disabled={isLoading || !canSubmit || isSubmitting}
                     {...props}
                 >
-                    {isSubmitting && (
-                        <Loader2 className="me-2 h-4 w-4 animate-spin" />
-                    )}
+                    {(isSubmitting || isLoading) ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : null}
                     {children}
                 </Button>
             )}

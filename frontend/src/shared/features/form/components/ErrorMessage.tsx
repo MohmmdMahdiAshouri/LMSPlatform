@@ -4,6 +4,8 @@ export function FieldErrorMessage({ errors }: { errors: unknown[] }) {
     const message = typeof first === 'string' ? first : first?.message;
     if (!message) return null;
     return (
-        <p className="mt-1 text-sm font-medium text-destructive">{message}</p>
+        <p className="mt-1 overflow-hidden text-sm font-medium text-destructive wrap-break-word line-clamp-2">
+            {message ?? ''}
+        </p>
     );
 }

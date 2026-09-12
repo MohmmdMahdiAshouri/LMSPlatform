@@ -1,17 +1,16 @@
-'use client';
 import { useAppForm } from '@/shared/features/form/hooks/use-app-form';
 import {
-    signUpFormSchema,
     signUpFormDefaultValues,
-    type signUpFormValues,
+    signUpFormSchema,
+    SignUpFormValues,
 } from '../../schemas/signUp.schema';
 
-export function signUpForm({
-    onSubmit,
-}: {
-    onSubmit: (values: signUpFormValues) => Promise<void> | void;
-}) {
-    const { handleSubmit, AppField, SubmitButton, AppForm } = useAppForm({
+interface SignUpFormProps {
+    onSubmit: (value: SignUpFormValues) => Promise<void> | void;
+    isLoading: boolean;
+}
+export default function SignUpForm({ onSubmit, isLoading }: SignUpFormProps) {
+    const { handleSubmit, AppField, AppForm, SubmitButton } = useAppForm({
         defaultValues: signUpFormDefaultValues,
         validators: {
             onChange: signUpFormSchema,
@@ -20,17 +19,15 @@ export function signUpForm({
             await onSubmit(value);
         },
     });
-
     return (
-        <div className="w-full h-screen flex items-center justify-center">
-            <form
-                className="w-1/2 p-5 grid grid-cols-2 gap-5 rounded-2xl bg-blue-950"
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleSubmit();
-                }}
-            >
+        <form
+            onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSubmit();
+            }}
+        >
+            <div className="mt-6 space-y-4">
                 <AppField name="email">
                     {(field) => (
                         <field.TextField
@@ -66,18 +63,22 @@ export function signUpForm({
                     {(field) => (
                         <field.TextField
                             type="password"
+                            label="تایید رمز عبور"
+                            placeholder="Password123!"
                             dir="ltr"
-                            label="تکرار رمز عبور"
                         />
                     )}
                 </AppField>
 
                 <AppForm>
-                    <div className="flex items-center gap-3">
-                        <SubmitButton>ثبت نام</SubmitButton>
-                    </div>
+                    <SubmitButton
+                        isLoading={isLoading}
+                        className="w-full rounded-md bg-primary py-3 text-sm text-primary-foreground cursor-pointer"
+                    >
+                        ساخت حساب
+                    </SubmitButton>
                 </AppForm>
-            </form>
-        </div>
+            </div>
+        </form>
     );
 }
