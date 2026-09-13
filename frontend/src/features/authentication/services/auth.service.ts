@@ -1,5 +1,5 @@
 import { apiClient } from '@/shared/lib/apiClient';
-import { signInFormValues } from '../schemas/signIn.schema';
+import { SignInFormValues } from '../schemas/signIn.schema';
 import { ResetPassword, signInResponseType } from '../types/auth.type';
 import { signUpPayloadType, signUpResponseType } from '../types/auth.type';
 
@@ -10,7 +10,7 @@ export async function signUpService(payload: signUpPayloadType) {
     );
     return response;
 }
-export async function signInService(payload: signInFormValues) {
+export async function signInService(payload: SignInFormValues) {
     const response = await apiClient.post<signInResponseType>(
         'auth/login',
         payload,
