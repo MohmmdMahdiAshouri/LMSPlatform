@@ -8,13 +8,12 @@ import { PASSWORD_REGEX } from '@/features/authentication/constants/authenticati
 import {
     AlertDialog,
     AlertDialogAction,
-    AlertDialogCancel,
     AlertDialogContent,
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/shared/components/ui/alert-dialog';
-import { useResetPassword } from '@/features/authentication/hooks/usesignIn';
+import { useResetPassword } from '@/features/authentication/hooks/useAuth';
 
 const isValidate = z.object({
     newPassword: z
@@ -65,6 +64,9 @@ export default function ResetPassword() {
                         onChange={handleInputChange}
                         dir="ltr"
                         name="new-password"
+                        className={
+                            error ? 'border-red-500' : 'border-secondary'
+                        }
                     />
                     {error && (
                         <AlertDialogTitle className="text-red-500 text-sm mt-1">
@@ -73,7 +75,6 @@ export default function ResetPassword() {
                     )}
                 </AlertDialogHeader>
                 <AlertDialogFooter className="flex justify-center!">
-                    <AlertDialogCancel>لغو</AlertDialogCancel>
                     <AlertDialogAction
                         disabled={
                             isValidate.safeParse({ newPassword: input }).success
