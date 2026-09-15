@@ -12,7 +12,6 @@
     "@base-ui/react": "^1.8.0",
     "@tanstack/react-form": "^1.33.5",
     "@tanstack/react-query": "^5.102.8",
-    "@tanstack/zod-form-adapter": "^0.42.1",
     "axios": "^1.20.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

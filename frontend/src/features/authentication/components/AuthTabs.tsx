@@ -1,9 +1,9 @@
 import { Button } from '@/shared/components/ui/button';
-import { AuthTabsType } from '../../types/auth.type';
+import { AuthTabsType } from '../types/auth.type';
 
 interface AuthTabsProps {
     authTab: AuthTabsType;
-    setAuthTab: (value: AuthTabsType) => void
+    setAuthTab: (value: AuthTabsType) => void;
 }
 
 export function AuthTabs({ authTab, setAuthTab }: AuthTabsProps) {

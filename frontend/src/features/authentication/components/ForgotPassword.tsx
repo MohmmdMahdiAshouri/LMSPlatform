@@ -13,7 +13,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/shared/components/ui/alert-dialog';
-import { useForgotPassword } from '../../hooks/useAuth';
+import { useForgotPassword } from '../hooks/useAuth';
 
 const isValidate = z.object({
     email: z.email('ایمیل معتبر نیست').trim().toLowerCase(),

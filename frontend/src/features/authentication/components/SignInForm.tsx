@@ -1,24 +1,28 @@
 import { useAppForm } from '@/shared/features/form/hooks/use-app-form';
 import {
-    signUpFormDefaultValues,
-    signUpFormSchema,
-    SignUpFormValues,
-} from '../../schemas/signUp.schema';
+    signInFormDefaultValues,
+    signInFormSchema,
+    SignInFormValues,
+} from '../schemas/signIn.schema';
+import { ForgotPassword } from './ForgotPassword';
+import { cn } from '@/shared/lib/utils';
 
-interface SignUpFormProps {
-    onSubmit: (value: SignUpFormValues) => Promise<void> | void;
+interface SignInFormProps {
+    onSubmit: (value: SignInFormValues) => Promise<void> | void;
     isLoading: boolean;
 }
-export default function SignUpForm({ onSubmit, isLoading }: SignUpFormProps) {
+
+export function SignInForm({ onSubmit, isLoading }: SignInFormProps) {
     const { handleSubmit, AppField, AppForm, SubmitButton } = useAppForm({
-        defaultValues: signUpFormDefaultValues,
+        defaultValues: signInFormDefaultValues,
         validators: {
-            onChange: signUpFormSchema,
+            onChange: signInFormSchema,
         },
         onSubmit: async ({ value }) => {
             await onSubmit(value);
         },
     });
+
     return (
         <form
             onSubmit={(e) => {
@@ -28,21 +32,11 @@ export default function SignUpForm({ onSubmit, isLoading }: SignUpFormProps) {
             }}
         >
             <div className="mt-6 space-y-4">
-                <AppField name="email">
+                <AppField name="emailOrUsername">
                     {(field) => (
                         <field.TextField
-                            label="ایمیل"
-                            placeholder="email@example.com"
-                            dir="ltr"
-                        />
-                    )}
-                </AppField>
-
-                <AppField name="username">
-                    {(field) => (
-                        <field.TextField
-                            label="نام کاربری"
-                            placeholder="username_123"
+                            label="ایمیل یا نام کاربری"
+                            placeholder="email@example.com / username_123"
                             dir="ltr"
                         />
                     )}
@@ -59,23 +53,14 @@ export default function SignUpForm({ onSubmit, isLoading }: SignUpFormProps) {
                     )}
                 </AppField>
 
-                <AppField name="confirmPassword">
-                    {(field) => (
-                        <field.TextField
-                            type="password"
-                            label="تایید رمز عبور"
-                            placeholder="Password123!"
-                            dir="ltr"
-                        />
-                    )}
-                </AppField>
+                <ForgotPassword />
 
                 <AppForm>
                     <SubmitButton
                         isLoading={isLoading}
                         className="w-full rounded-md bg-primary py-3 text-sm text-primary-foreground cursor-pointer"
                     >
-                        ساخت حساب
+                        ورود به حساب
                     </SubmitButton>
                 </AppForm>
             </div>

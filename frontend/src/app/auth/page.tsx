@@ -1,19 +1,19 @@
 'use client';
-import { AuthBrandPanel } from '@/features/authentication/components/auth/Auth-brand-panel';
-import { AuthTabs } from '@/features/authentication/components/auth/AuthTabs';
-import { AuthFooter } from '@/features/authentication/components/auth/AuthFooter';
-import { SignInForm } from '@/features/authentication/components/auth/SignInForm';
-import { AuthHeader } from '@/features/authentication/components/auth/AuthHeader';
+import { AuthBrandPanel } from '@/features/authentication/components/Auth-brand-panel';
+import { AuthTabs } from '@/features/authentication/components/AuthTabs';
+import { AuthFooter } from '@/features/authentication/components/AuthFooter';
+import { SignInForm } from '@/features/authentication/components/SignInForm';
+import { AuthHeader } from '@/features/authentication/components/AuthHeader';
 import { useSignIn, useSignUp } from '@/features/authentication/hooks/useAuth';
 import { useState } from 'react';
 import { AuthTabsType } from '@/features/authentication/types/auth.type';
-import SignUpForm from '@/features/authentication/components/auth/SignUpForm';
+import SignUpForm from '@/features/authentication/components/SignUpForm';
 
 export default function AuthPage() {
     const [authTab, setAuthTab] = useState<AuthTabsType>('signIn');
 
     const signUp = useSignUp();
-    
+
     const signIn = useSignIn();
 
     return (
