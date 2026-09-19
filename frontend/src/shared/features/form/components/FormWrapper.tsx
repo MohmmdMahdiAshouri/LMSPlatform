@@ -2,7 +2,7 @@
 import type { ReactNode } from 'react';
 import { useFieldContext } from '../hooks/use-form-context';
 import { Label } from '@/shared/components/ui/label';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/lib/client/client-utils';
 import { FieldErrorMessage } from './ErrorMessage';
 
 export function FieldWrapper({

@@ -29,6 +29,7 @@ export default function GooglePage() {
         window.history.replaceState(null, '', window.location.pathname);
 
         router.replace('/');
+        router.refresh()
     }, [router, setAccessToken]);
 
     return <p>...در حال ورود</p>;

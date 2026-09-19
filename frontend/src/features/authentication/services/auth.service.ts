@@ -1,17 +1,21 @@
-import { apiClient } from '@/shared/lib/apiClient';
+import { apiClient } from '@/shared/lib/client/apiClient';
 import { SignInFormValues } from '../schemas/signIn.schema';
-import { ResetPassword, signInResponseType } from '../types/auth.type';
-import { signUpPayloadType, signUpResponseType } from '../types/auth.type';
+import {
+    CurrentUser,
+    ResetPassword,
+    SignInResponseType,
+} from '../types/auth.type';
+import { SignUpPayloadType, SignUpResponseType } from '../types/auth.type';
 
-export async function signUpService(payload: signUpPayloadType) {
-    const response = await apiClient.post<signUpResponseType>(
+export async function signUpService(payload: SignUpPayloadType) {
+    const response = await apiClient.post<SignUpResponseType>(
         'auth/register',
         payload,
     );
     return response;
 }
 export async function signInService(payload: SignInFormValues) {
-    const response = await apiClient.post<signInResponseType>(
+    const response = await apiClient.post<SignInResponseType>(
         'auth/login',
         payload,
     );
@@ -27,3 +31,10 @@ export async function resetPassword(payload: ResetPassword) {
     const response = await apiClient.post('auth/reset-password', payload);
     return response;
 }
+
+export async function currentUser() {
+    const response = await apiClient.get<CurrentUser>('auth/me')
+    return response
+}
+
+

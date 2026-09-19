@@ -1,12 +1,18 @@
-import { useMutation } from '@tanstack/react-query';
-import { signUpService } from '../services/auth.service';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { SignUpFormValues } from '../schemas/signUp.schema';
-import { getErrorMessage } from '@/shared/lib/utils';
+import { getErrorMessage } from '@/shared/lib/client/client-utils';
 import {
+    currentUser,
     forgotPasswordService,
     resetPassword,
     signInService,
+    signUpService,
 } from '../services/auth.service';
+import { useAuthStore } from '../stores/auth.store';
+import { useRouter } from 'next/navigation';
+import { queryClient } from '@/shared/lib/client/tanstackClient';
+
+const setAccessToken = useAuthStore.getState().setAccessToken;
 
 export function useSignUp() {
     return useMutation({
@@ -15,7 +21,10 @@ export function useSignUp() {
             return signUpService(payload);
         },
         onSuccess: (res) => {
-            alert(res.data?.accessToken);
+            if (!res.data) return;
+            setAccessToken(res.data.accessToken);
+
+            alert('succes');
         },
         onError: (error) => {
             alert(getErrorMessage(error));
@@ -23,10 +32,15 @@ export function useSignUp() {
     });
 }
 export function useSignIn() {
+    const router = useRouter();
+    // const queryClient = queryClient()
     return useMutation({
         mutationFn: signInService,
         onSuccess: (res) => {
-            alert(res?.data?.accessToken);
+            if (!res.data) return;
+            setAccessToken(res.data.accessToken);
+            // router.replace('/')
+            queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
         },
         onError: (error) => {
             alert(getErrorMessage(error));
@@ -55,5 +69,15 @@ export function useResetPassword() {
         onError: (error) => {
             alert(getErrorMessage(error));
         },
+    });
+}
+
+export function useCurrentUser() {
+    return useQuery({
+        queryKey: ['auth', 'me'] as const,
+        queryFn: currentUser,
+        retry: false,
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60,
     });
 }
