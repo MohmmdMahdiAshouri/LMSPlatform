@@ -6,6 +6,7 @@ import type {
     InternalAxiosRequestConfig,
 } from 'axios';
 import { ApiResponse } from './apiResponse.type';
+import { useAuthStore } from '@/features/authentication/stores/auth.store';
 
 type ApiClient = Omit<
     AxiosInstance,
@@ -66,7 +67,7 @@ function processQueue(error: unknown, token: string | null) {
 }
 
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-    const token = null; // useAuthStore.getState().accessToken; // اینجا باید accessToken واقعی از store گرفته شود
+    const token = useAuthStore.getState().accessToken;
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -85,8 +86,7 @@ apiClient.interceptors.response.use(
         }
 
         if (originalRequest.url === '/auth/refresh-token') {
-            // useAuthStore.getState().logout();
-            window.location.href = '/signIn';
+            useAuthStore.getState().clear();
             return Promise.reject(error);
         }
 
@@ -109,8 +109,8 @@ apiClient.interceptors.response.use(
                 { withCredentials: true },
             );
 
-            const { accessToken } = response.data;
-            // useAuthStore.getState().setAccessToken(accessToken);
+            const { accessToken } = response.data.data;
+            useAuthStore.getState().setAccessToken(accessToken);
 
             processQueue(null, accessToken);
 
@@ -118,8 +118,7 @@ apiClient.interceptors.response.use(
             return apiClient(originalRequest);
         } catch (refreshError) {
             processQueue(refreshError, null);
-            // useAuthStore.getState().logout();
-            window.location.href = '/signIn';
+            useAuthStore.getState().clear();
             return Promise.reject(refreshError);
         } finally {
             isRefreshing = false;

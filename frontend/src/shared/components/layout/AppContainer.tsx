@@ -1,4 +1,4 @@
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/lib/client/client-utils';
 
 interface AppContainerProps {
     children: React.ReactNode;

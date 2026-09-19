@@ -1,15 +1,15 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/lib/client/client-utils';
 import { Providers } from '../shared/components/layout/Providers';
 import { AppContainer } from '@/shared/components/layout/AppContainer';
+import Header from '@/shared/components/layout/Header';
 
 export const metadata: Metadata = {
     title: 'LMS Platform',
     description: 'A Learning Management System Platform',
 };
-
 
 const vazir = localFont({
     src: [
@@ -27,7 +27,7 @@ const vazir = localFont({
     variable: '--font-vazir',
 });
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
@@ -39,11 +39,12 @@ export default function RootLayout({
             className={cn('h-full antialiased', vazir.variable)}
         >
             <body className="min-h-full min-w-full flex flex-col">
-                <AppContainer>
-                    <Providers>
-                        {children}
-                    </Providers>
-                </AppContainer>
+                <Providers>
+                    {/* <AuthProvider> */}
+                    <Header />
+                    <AppContainer>{children}</AppContainer>
+                    {/* </AuthProvider> */}
+                </Providers>
             </body>
         </html>
     );
