@@ -35,14 +35,13 @@ export interface CurrentUser {
     avatarUrl: string | null;
 }
 
-export interface InitializeAuthType {
-    authenticated: boolean;
-    accessToken: string | null;
-    user: CurrentUser | null;
-    setCookie: string[] | null;
+type DeviceType = 'DESKTOP' | 'MOBILE' | 'TABLET' | 'UNKNOWN'
+export interface session {
+    id: string;
+    deviceType: DeviceType;
+    browser: string;
+    os: string;
+    lastActivityAt: Date;
+    expiresAt: Date;
+    isCurrent: boolean
 }
-
-export type AuthProviderProps = {
-    accessToken: string | null;
-    children: React.ReactNode;
-};

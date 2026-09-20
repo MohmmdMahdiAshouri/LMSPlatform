@@ -13,9 +13,9 @@ function UserSkeleton() {
 export default function Header() {
     const { data, isPending } = useCurrentUser();
     const user = data?.data;
-
+    
     return (
-        <header className="grid grid-cols-3 border-b-2 border-primary bg-accent px-8 py-5 mb-5">
+        <header className="grid grid-cols-3 border-b-2 border-primary px-8 py-5 bg-card">
             <div className="flex items-center gap-x-2 text-muted-foreground">
                 <Image
                     className="rounded-full"

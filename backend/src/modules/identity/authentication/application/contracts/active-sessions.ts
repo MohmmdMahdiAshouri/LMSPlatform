@@ -7,4 +7,5 @@ export interface ActiveSession {
     os: string;
     lastActivityAt: Date;
     expiresAt: Date;
+    isCurrent: boolean;
 }

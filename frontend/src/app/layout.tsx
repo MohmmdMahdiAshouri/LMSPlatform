@@ -3,7 +3,6 @@ import localFont from 'next/font/local';
 import './globals.css';
 import { cn } from '@/shared/lib/client/client-utils';
 import { Providers } from '../shared/components/layout/Providers';
-import { AppContainer } from '@/shared/components/layout/AppContainer';
 import Header from '@/shared/components/layout/Header';
 
 export const metadata: Metadata = {
@@ -40,10 +39,8 @@ export default async function RootLayout({
         >
             <body className="min-h-full min-w-full flex flex-col">
                 <Providers>
-                    {/* <AuthProvider> */}
                     <Header />
-                    <AppContainer>{children}</AppContainer>
-                    {/* </AuthProvider> */}
+                    {children}
                 </Providers>
             </body>
         </html>
