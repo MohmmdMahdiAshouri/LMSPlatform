@@ -1,5 +1,5 @@
 'use client';
-import { AuthBrandPanel } from '@/features/authentication/components/Auth-brand-panel';
+import { AuthBrandPanel } from '@/features/authentication/components/AuthBrandPanel';
 import { AuthTabs } from '@/features/authentication/components/AuthTabs';
 import { AuthFooter } from '@/features/authentication/components/AuthFooter';
 import { SignInForm } from '@/features/authentication/components/SignInForm';
@@ -17,7 +17,7 @@ export default function AuthPage() {
     const signIn = useSignIn();
 
     return (
-        <main>
+        <main className="container">
             <div className="flex justify-between items-center h-screen">
                 <section className="w-5/12 h-full p-5 lg:px-10">
                     <AuthHeader />

@@ -1,18 +1,23 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { SignUpFormValues } from '../schemas/signUp.schema';
 import { getErrorMessage } from '@/shared/lib/client/client-utils';
 import {
+    changePassword,
     currentUser,
     forgotPasswordService,
+    logoutAll,
+    logoutCurrent,
+    logoutSpecific,
+    resendVerifyEmail,
     resetPassword,
+    sessions,
     signInService,
     signUpService,
 } from '../services/auth.service';
 import { useAuthStore } from '../stores/auth.store';
-import { useRouter } from 'next/navigation';
-import { queryClient } from '@/shared/lib/client/tanstackClient';
 
 const setAccessToken = useAuthStore.getState().setAccessToken;
+const clear = useAuthStore.getState().clear
 
 export function useSignUp() {
     return useMutation({
@@ -23,7 +28,7 @@ export function useSignUp() {
         onSuccess: (res) => {
             if (!res.data) return;
             setAccessToken(res.data.accessToken);
-
+            
             alert('succes');
         },
         onError: (error) => {
@@ -32,14 +37,13 @@ export function useSignUp() {
     });
 }
 export function useSignIn() {
-    const router = useRouter();
-    // const queryClient = queryClient()
+    const queryClient = useQueryClient();
+    
     return useMutation({
         mutationFn: signInService,
         onSuccess: (res) => {
             if (!res.data) return;
             setAccessToken(res.data.accessToken);
-            // router.replace('/')
             queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
         },
         onError: (error) => {
@@ -76,8 +80,81 @@ export function useCurrentUser() {
     return useQuery({
         queryKey: ['auth', 'me'] as const,
         queryFn: currentUser,
-        retry: false,
-        staleTime: 1000 * 60 * 5,
-        gcTime: 1000 * 60,
+    });
+}
+
+export function useResendVerifyEmail() {
+    return useMutation({
+        mutationFn: resendVerifyEmail,
+        onSuccess: (res) => {
+            alert(res.message);
+        },
+        onError: (error) => {
+            alert(getErrorMessage(error));
+        },
+    });
+}
+
+export function useChangePassword() {
+    return useMutation({
+        mutationFn: changePassword,
+        onSuccess: (res) => {
+            alert(res.message);
+        },
+        onError: (error) => {
+            alert(getErrorMessage(error));
+        },
+    });
+}
+
+export function useSessions() {
+    return useQuery({
+        queryKey: ['auth', 'sessions'],
+        queryFn: sessions,
+    });
+}
+
+export function useLogoutCurrent() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: logoutCurrent,
+        onSuccess: (res) => {
+            clear();
+            queryClient.setQueryData(['auth', 'me'], {
+                data: null,
+            });
+        },
+        onError: (error) => {
+            alert(getErrorMessage(error));
+        },
+    });
+}
+
+export function useLogoutAll() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: logoutAll,
+        onSuccess: (res) => {
+            clear();
+            queryClient.setQueryData(['auth', 'me'], {
+                data: null,
+            });
+        },
+        onError: (error) => {
+            alert(getErrorMessage(error));
+        },
+    });
+}
+
+export function useLogoutSpecific() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (sessionId: string) => logoutSpecific(sessionId),
+        onSuccess: (res) => {
+            queryClient.invalidateQueries({queryKey: ['auth', 'sessions']})
+        },
+        onError: (error) => {
+            alert(getErrorMessage(error));
+        },
     });
 }

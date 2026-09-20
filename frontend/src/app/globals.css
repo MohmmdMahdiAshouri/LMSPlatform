@@ -64,7 +64,7 @@
     --muted-foreground: oklch(48% 0.04 210);
 
     --border: oklch(91% 0.02 210);
-    --input: oklch(100% 0 0);
+    --input: oklch(20% 0.03 220);
     --ring: oklch(48% 0.11 190);
 
     --destructive: oklch(64% 0.2 22);
@@ -121,5 +121,9 @@
             transition-duration: 0.01ms !important;
             scroll-behavior: auto !important;
         }
+    }
+
+    .container {
+        @apply mx-auto w-full h-full max-w-7xl px-4 sm:px-6 lg:px-10
     }
 }

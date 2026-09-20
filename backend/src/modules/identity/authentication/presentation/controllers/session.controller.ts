@@ -70,6 +70,6 @@ export class SessionController {
     @GetActiveSessionsSwagger()
     @Response({ statusCode: HttpStatus.OK })
     getActiveSessions(@CurrentUser() user: AuthenticatedUser) {
-        return this.queryBus.execute(new GetActiveSessionsQuery(user.userId));
+        return this.queryBus.execute(new GetActiveSessionsQuery(user.userId, user.sessionId));
     }
 }

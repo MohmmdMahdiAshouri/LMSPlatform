@@ -20,6 +20,7 @@ export class GetActiveSessionsHandler implements IQueryHandler<GetActiveSessions
             os: session.getOperatingSystem(),
             lastActivityAt: session.getLastActivityAt(),
             expiresAt: session.getExpiresAt(),
+            isCurrent: query.sessionId === session.getId(),
         }));
     }
 }
