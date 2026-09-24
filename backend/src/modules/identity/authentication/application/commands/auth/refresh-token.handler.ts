@@ -30,7 +30,7 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand>
         private readonly tokenHasher: TokenHasher,
         private readonly authenticationService: AuthenticationService,
     ) {}
-    async execute(command: RefreshTokenCommand): Promise<AuthenticationResult> {
+    async execute(command: RefreshTokenCommand): Promise<Omit<AuthenticationResult, 'refreshToken'>> {
         const hashedRefreshToken = this.tokenHasher.hash(command.refreshToken);
 
         const refreshToken = await this.refreshTokenRepository.findByTokenHash(hashedRefreshToken);
@@ -42,6 +42,6 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand>
         const user = await this.userRepository.findById(session.getUserId());
         if (!user) throw new UserNotFoundException();
 
-        return this.authenticationService.rotateRefreshToken(user, session);
+        return this.authenticationService.refreshAccessToken(user, session);
     }
 }
