@@ -3,18 +3,19 @@ import { SignUpFormValues } from '../schemas/signUp.schema';
 import { getErrorMessage } from '@/shared/lib/client/client-utils';
 import {
     changePassword,
-    currentUser,
+    currentUserClient,
     forgotPasswordService,
     logoutAll,
     logoutCurrent,
     logoutSpecific,
     resendVerifyEmail,
     resetPassword,
-    sessions,
+    sessionsClient,
     signInService,
     signUpService,
 } from '../services/auth.service';
 import { useAuthStore } from '../stores/auth.store';
+import { useRouter } from 'next/navigation';
 
 const setAccessToken = useAuthStore.getState().setAccessToken;
 const clear = useAuthStore.getState().clear
@@ -78,8 +79,8 @@ export function useResetPassword() {
 
 export function useCurrentUser() {
     return useQuery({
-        queryKey: ['auth', 'me'] as const,
-        queryFn: currentUser,
+        queryKey: ['auth', 'me'],
+        queryFn: currentUserClient,
     });
 }
 
@@ -110,19 +111,20 @@ export function useChangePassword() {
 export function useSessions() {
     return useQuery({
         queryKey: ['auth', 'sessions'],
-        queryFn: sessions,
+        queryFn: sessionsClient,
     });
 }
 
 export function useLogoutCurrent() {
     const queryClient = useQueryClient();
+    const router = useRouter()
     return useMutation({
         mutationFn: logoutCurrent,
         onSuccess: (res) => {
             clear();
-            queryClient.setQueryData(['auth', 'me'], {
-                data: null,
-            });
+            queryClient.setQueryData(['auth', 'me'], null);
+
+            router.replace('/')
         },
         onError: (error) => {
             alert(getErrorMessage(error));

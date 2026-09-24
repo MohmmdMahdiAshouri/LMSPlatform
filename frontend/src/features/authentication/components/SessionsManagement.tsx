@@ -1,17 +1,29 @@
 'use client';
-import { LogOut, Monitor, ScreenShareOff, Smartphone, Tablet, X } from 'lucide-react';
-import { useLogoutAll, useLogoutCurrent, useLogoutSpecific, useSessions } from '../hooks/useAuth';
+import {
+    LogOut,
+    Monitor,
+    ScreenShareOff,
+    Smartphone,
+    Tablet,
+    X,
+} from 'lucide-react';
+import {
+    useLogoutAll,
+    useLogoutCurrent,
+    useLogoutSpecific,
+    useSessions,
+} from '../hooks/useAuth';
 import { Button } from '@/shared/components/ui/button';
 
 export default function SessionsManagement() {
-    const { data } = useSessions();
-    const sessions = data?.data;
+    const { data: sessions } = useSessions();
 
     const { mutate, isPending } = useLogoutCurrent();
 
-    const {mutate: logoutAll, isPending: logoutAllPending} = useLogoutAll()
+    const { mutate: logoutAll, isPending: logoutAllPending } = useLogoutAll();
 
-    const {mutate: logoutSpecific, isPending: logoutSpecificPending} = useLogoutSpecific()
+    const { mutate: logoutSpecific, isPending: logoutSpecificPending } =
+        useLogoutSpecific();
 
     return (
         <section className="rounded-xl border border-border bg-card p-5 shadow-sm">

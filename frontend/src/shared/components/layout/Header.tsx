@@ -11,8 +11,7 @@ function UserSkeleton() {
 }
 
 export default function Header() {
-    const { data, isPending } = useCurrentUser();
-    const user = data?.data;
+    const { data: user, isPending } = useCurrentUser();
     
     return (
         <header className="grid grid-cols-3 border-b-2 border-primary px-8 py-5 bg-card">
@@ -66,7 +65,7 @@ export default function Header() {
                     <CircleHelp className="size-4" />
                 </button>
 
-                {isPending ? (
+                {false ? (
                     <UserSkeleton />
                 ) : (
                     <>
@@ -75,9 +74,9 @@ export default function Header() {
                                 href="/dashboard"
                                 className="flex items-center justify-center gap-2 size-8"
                             >
-                                {user.avatarUrl ? (
+                                {user?.avatarUrl ? (
                                     <Image
-                                        src={user.avatarUrl}
+                                        src={user?.avatarUrl}
                                         width={40}
                                         height={40}
                                         alt={user.username}
@@ -88,7 +87,10 @@ export default function Header() {
                                 )}
                             </Link>
                         ) : (
-                            <Link href="/auth" className="flex justify-center items-center size-8">
+                            <Link
+                                href="/auth"
+                                className="flex justify-center items-center size-8"
+                            >
                                 <LogIn />
                             </Link>
                         )}

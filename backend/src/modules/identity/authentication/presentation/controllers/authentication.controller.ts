@@ -108,13 +108,9 @@ export class AuthenticationController {
     @Public()
     @RefreshTokenSwagger()
     @Response({ statusCode: HttpStatus.OK })
-    async refreshToken(@RefreshTokenCookie() refreshToken: string, @Res({ passthrough: true }) res: ExpressResponse) {
+    refreshToken(@RefreshTokenCookie() refreshToken: string, @Res({ passthrough: true }) res: ExpressResponse) {
         try {
-            const result = await this.commandBus.execute<RefreshTokenCommand, AuthenticationResult>(
-                new RefreshTokenCommand(refreshToken),
-            );
-            this.authenticationContext.formResponse(res, result.refreshToken);
-            return { accessToken: result.accessToken };
+            return this.commandBus.execute(new RefreshTokenCommand(refreshToken));
         } catch (error) {
             this.authenticationContext.clearRefreshTokenCookie(res);
             throw error;

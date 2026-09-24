@@ -112,6 +112,16 @@ export class AuthenticationService {
     }
 
     @Transactional()
+    async refreshAccessToken(user: User, session: Session): Promise<Omit<AuthenticationResult, 'refreshToken'>> {
+        session.refreshActivity(this.clock.now(), session.getExpiresAt());
+        await this.sessionRepository.update(session);
+
+        const accessToken = await this.accessTokenGenerator.generate(user, session);
+
+        return { accessToken };
+    }
+
+    @Transactional()
     async revokeAllSessions(userId: string): Promise<void> {
         const sessions = await this.sessionRepository.findAllActiveByUserId(userId);
 
