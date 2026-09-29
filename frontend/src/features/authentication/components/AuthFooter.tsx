@@ -1,3 +1,5 @@
+import { API_CONFIG } from '@/shared/lib/client/api.config';
+
 export function AuthFooter() {
     return (
         <>
@@ -14,7 +16,7 @@ export function AuthFooter() {
 
             {/* Social */}
             <a
-                href={`${process.env.NEXT_PUBLIC_API_URL}/auth/google`}
+                href={`${API_CONFIG.CLIENT_BASE_URL}/auth/google`}
                 className="flex items-center text-md justify-center gap-2 rounded-md border border-border bg-card py-2.5 font-medium text-foreground transition-colors hover:bg-muted"
             >
                 <span className="font-bold">G</span>

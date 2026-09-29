@@ -42,7 +42,7 @@ export function ForgotPassword() {
         }
     };
 
-    const { mutate } = useForgotPassword();
+    const { mutate, isPending } = useForgotPassword();
 
     return (
         <AlertDialog>
@@ -84,10 +84,8 @@ export function ForgotPassword() {
                 <AlertDialogFooter className="flex justify-center!">
                     <AlertDialogCancel>لغو</AlertDialogCancel>
                     <AlertDialogAction
-                        onClick={() => {
-                            console.log(input);
-                            return mutate(input);
-                        }}
+                        disabled={isPending || !isValidate}
+                        onClick={() => mutate(input)}
                     >
                         تایید
                     </AlertDialogAction>

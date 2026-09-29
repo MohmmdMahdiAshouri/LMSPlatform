@@ -13,9 +13,8 @@ export default async function Page() {
     const queryClient = getQueryClient();
 
     let user;
-    let sessions
     try {
-        [user, sessions] = await Promise.all([
+        [user] = await Promise.all([
             queryClient.query({
                 queryKey: ['auth', 'me'],
                 queryFn: currentUserServer,
@@ -26,13 +25,8 @@ export default async function Page() {
             }),
         ]);
     } catch {
-        return <div>کاربر پیدا نشد</div>;
     }
-    
-    if (!user) return <div>کاربر پیدا نشد</div>;
-    
-    console.log(sessions);
-    console.log(user);
+
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>
             <div className="w-full mx-auto space-y-8">
@@ -46,7 +40,7 @@ export default async function Page() {
                 </div>
 
                 <div className="flex gap-x-5">
-                    <ResendVerifyEmail user={user} />
+                    <ResendVerifyEmail user={user!} />
                     <ChangePassword />
                 </div>
 

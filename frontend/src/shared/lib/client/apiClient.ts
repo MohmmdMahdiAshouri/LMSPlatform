@@ -7,6 +7,7 @@ import type {
 } from 'axios';
 import { ApiResponse } from './apiResponse.type';
 import { useAuthStore } from '@/features/authentication/stores/auth.store';
+import { API_CONFIG } from './api.config';
 
 type ApiClient = Omit<
     AxiosInstance,
@@ -44,7 +45,7 @@ type ApiClient = Omit<
 };
 
 export const apiClient: ApiClient = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL,
+    baseURL: API_CONFIG.CLIENT_BASE_URL,
     withCredentials: true,
     headers: { 'Content-Type': 'application/json' },
 });
@@ -104,7 +105,7 @@ apiClient.interceptors.response.use(
 
         try {
             const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh-token`,
+                `${API_CONFIG.CLIENT_BASE_URL}/auth/refresh-token`,
                 {},
                 { withCredentials: true },
             );

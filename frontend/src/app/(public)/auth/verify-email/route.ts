@@ -1,3 +1,4 @@
+import { API_CONFIG } from '@/shared/lib/client/api.config';
 import { redirect } from 'next/navigation';
 
 export async function GET(req: Request) {
@@ -6,15 +7,12 @@ export async function GET(req: Request) {
 
     let ok = false;
     try {
-        const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/auth/verify-email`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ verificationToken: token }),
-                cache: 'no-store',
-            },
-        );
+        const res = await fetch(`${API_CONFIG.SERVER_BASE_URL}/auth/verify-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ verificationToken: token }),
+            cache: 'no-store',
+        });
         ok = res.ok;
     } catch (error) {
         console.error('verify-email fetch failed:', error);
