@@ -21,6 +21,7 @@ const setAccessToken = useAuthStore.getState().setAccessToken;
 const clear = useAuthStore.getState().clear
 
 export function useSignUp() {
+    const router = useRouter();
     return useMutation({
         mutationFn: (values: SignUpFormValues) => {
             const { confirmPassword, ...payload } = values;
@@ -29,8 +30,7 @@ export function useSignUp() {
         onSuccess: (res) => {
             if (!res.data) return;
             setAccessToken(res.data.accessToken);
-            
-            alert('succes');
+            router.replace('/dashboard')
         },
         onError: (error) => {
             alert(getErrorMessage(error));
@@ -39,6 +39,7 @@ export function useSignUp() {
 }
 export function useSignIn() {
     const queryClient = useQueryClient();
+    const router = useRouter();
     
     return useMutation({
         mutationFn: signInService,
@@ -46,6 +47,7 @@ export function useSignIn() {
             if (!res.data) return;
             setAccessToken(res.data.accessToken);
             queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
+            router.replace('/dashboard')
         },
         onError: (error) => {
             alert(getErrorMessage(error));
@@ -116,13 +118,14 @@ export function useSessions() {
 }
 
 export function useLogoutCurrent() {
-    const queryClient = useQueryClient();
     const router = useRouter()
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: logoutCurrent,
         onSuccess: (res) => {
             clear();
             queryClient.setQueryData(['auth', 'me'], null);
+            queryClient.removeQueries({queryKey: ['auth']})
 
             router.replace('/')
         },

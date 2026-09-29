@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { API_CONFIG } from '../client/api.config';
 
 type ServerFetchOptions = {
     auth?: boolean; // آیا این GET نیاز به احراز هویت داره؟
@@ -16,7 +17,7 @@ export async function serverFetch<T>(
         if (!refreshToken) return null;
 
         const refreshRes = await fetch(
-            `${process.env.API_URL}/auth/refresh-token`,
+            `${API_CONFIG.SERVER_BASE_URL}/auth/refresh-token`,
             {
                 method: 'POST',
                 headers: { cookie: `refreshToken=${refreshToken}` },
@@ -29,13 +30,12 @@ export async function serverFetch<T>(
         headers.Authorization = `Bearer ${data.accessToken}`;
     }
 
-    const res = await fetch(`${process.env.API_URL}/${endpoint}`, {
+    const res = await fetch(`${API_CONFIG.SERVER_BASE_URL}/${endpoint}`, {
         headers,
     });
     
     if (!res.ok) return null;
     
     const { data } = await res.json();
-    console.log(res, data);
     return data as T;
 }

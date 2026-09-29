@@ -35,8 +35,8 @@
     }
 
     export async function currentUserClient() {
-        const user = await apiClient.get<CurrentUser>('auth/me');
-        return user;
+        const response = await apiClient.get<CurrentUser>('auth/me');
+        return response.data;
     }
 
     export async function resendVerifyEmail() {
@@ -51,7 +51,7 @@
 
     export async function sessionsClient() {
         const response = await apiClient.get<session[]>('auth/sessions');
-        return response;
+        return response.data;
     }
 
     export async function logoutCurrent() {

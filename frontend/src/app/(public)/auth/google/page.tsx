@@ -20,7 +20,7 @@ export default function GooglePage() {
         const token = new URLSearchParams(hash).get('accessToken');
 
         if (!token) {
-            router.replace('/login');
+            router.replace('/auth?error=google_oauth_failed');
             return;
         }
 

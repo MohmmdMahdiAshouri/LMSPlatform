@@ -30,18 +30,19 @@ export interface CurrentUser {
     id: string;
     email: string;
     username: string;
-    status: string;
+    status: UserStatus;
     emailVerified: boolean;
     avatarUrl: string | null;
 }
 
 type DeviceType = 'DESKTOP' | 'MOBILE' | 'TABLET' | 'UNKNOWN'
+export type UserStatus = 'ACTIVE' | 'BANNED' | 'SUSPENDED' | 'DELETED';
 export interface session {
     id: string;
     deviceType: DeviceType;
     browser: string;
     os: string;
-    lastActivityAt: Date;
-    expiresAt: Date;
+    lastActivityAt: string;
+    expiresAt: string;
     isCurrent: boolean
 }
