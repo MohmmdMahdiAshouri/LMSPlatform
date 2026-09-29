@@ -1,0 +1,12 @@
+model School {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @db.VarChar(200)
+  ownerId   String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  roles           Role[]
+  userSchoolRoles UserSchoolRole[]
+
+  @@index([ownerId], name: "idx_school_owner_id")
+}
