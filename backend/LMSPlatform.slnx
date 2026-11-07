@@ -1,0 +1,24 @@
+<Solution>
+  <Folder Name="/src/" />
+
+  <Folder Name="/src/Bootstrappers/">
+    <Project Path="src/Bootstrappers/LMS.Api/LMS.Api.csproj" />
+  </Folder>
+
+  <Folder Name="/src/LMS.Identity/" />
+  <Folder Name="/src/LMS.Identity/LMS.Identity.Authentication/">
+    <Project Path="src/LMS.Identity/LMS.Identity.Authentication/Domain/LMS.Identity.Authentication.Domain.csproj" />
+    <Project Path="src/LMS.Identity/LMS.Identity.Authentication/Application/LMS.Identity.Authentication.Application.csproj" />
+    <Project Path="src/LMS.Identity/LMS.Identity.Authentication/Infrastructure/LMS.Identity.Authentication.Infrastructure.csproj" />
+    <Project Path="src/LMS.Identity/LMS.Identity.Authentication/WebApi/LMS.Identity.Authentication.WebApi.csproj" />
+  </Folder>
+
+  <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/LMS.Shared.Common/LMS.Shared.Common.csproj" />
+    <Project Path="src/Shared/LMS.Shared.Domain/LMS.Shared.Domain.csproj" />
+    <Project Path="src/Shared/LMS.Shared.Application/LMS.Shared.Application.csproj" />
+    <Project Path="src/Shared/LMS.Shared.ErrorHandling/LMS.Shared.ErrorHandling.csproj" />
+    <Project Path="src/Shared/LMS.Shared.ResponseHandling/LMS.Shared.ResponseHandling.csproj" />
+    <Project Path="src/Shared/LMS.Shared.Infrastructure/LMS.Shared.Infrastructure.csproj" />
+  </Folder>
+</Solution>

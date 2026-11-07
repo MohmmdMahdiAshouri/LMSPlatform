@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <RootNamespace>LMS.Api</RootNamespace>
+    <Description>LMS API host — composition root, DI registration, middleware pipeline.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Scalar.AspNetCore" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.OpenTelemetry" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="FluentValidation.AspNetCore" />
+    <PackageReference Include="Hangfire.AspNetCore" />
+    <PackageReference Include="Hangfire.SqlServer" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\LMS.Shared.Common\LMS.Shared.Common.csproj" />
+    <ProjectReference Include="..\..\Shared\LMS.Shared.Domain\LMS.Shared.Domain.csproj" />
+    <ProjectReference Include="..\..\Shared\LMS.Shared.Application\LMS.Shared.Application.csproj" />
+    <ProjectReference Include="..\..\Shared\LMS.Shared.Infrastructure\LMS.Shared.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Shared\LMS.Shared.ErrorHandling\LMS.Shared.ErrorHandling.csproj" />
+    <ProjectReference Include="..\..\Shared\LMS.Shared.ResponseHandling\LMS.Shared.ResponseHandling.csproj" />
+    <ProjectReference Include="..\..\LMS.Identity\LMS.Identity.Authentication\Domain\LMS.Identity.Authentication.Domain.csproj" />
+    <ProjectReference Include="..\..\LMS.Identity\LMS.Identity.Authentication\Application\LMS.Identity.Authentication.Application.csproj" />
+    <ProjectReference Include="..\..\LMS.Identity\LMS.Identity.Authentication\Infrastructure\LMS.Identity.Authentication.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\LMS.Identity\LMS.Identity.Authentication\WebApi\LMS.Identity.Authentication.WebApi.csproj" />
+  </ItemGroup>
+
+</Project>

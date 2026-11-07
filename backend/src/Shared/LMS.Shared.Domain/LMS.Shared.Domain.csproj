@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>LMS.Shared.Domain</RootNamespace>
+    <Description>DDD building blocks: BaseEntity, AggregateRoot, ValueObject, IDomainEvent, IUnitOfWork.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\LMS.Shared.Common\LMS.Shared.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR.Contracts" />
+  </ItemGroup>
+
+</Project>

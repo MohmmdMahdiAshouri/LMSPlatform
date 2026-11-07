@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>LMS.Identity.Authentication.Domain</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\LMS.Shared.Domain\LMS.Shared.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Shared\LMS.Shared.Common\LMS.Shared.Common.csproj" />
+  </ItemGroup>
+
+</Project>

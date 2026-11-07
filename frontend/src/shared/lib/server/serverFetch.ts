@@ -17,7 +17,7 @@ export async function serverFetch<T>(
         if (!refreshToken) return null;
 
         const refreshRes = await fetch(
-            `${API_CONFIG.SERVER_BASE_URL}/auth/refresh-token`,
+            `${API_CONFIG.SERVER_BASE_URL}/authentication/refresh-token`,
             {
                 method: 'POST',
                 headers: { cookie: `refreshToken=${refreshToken}` },

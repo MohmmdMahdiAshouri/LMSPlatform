@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>LMS.Shared.Application</RootNamespace>
+    <Description>Shared application layer: CQRS abstractions (Command/Query), MediatR pipeline behaviors.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LMS.Shared.Common\LMS.Shared.Common.csproj" />
+    <ProjectReference Include="..\LMS.Shared.Domain\LMS.Shared.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+
+</Project>

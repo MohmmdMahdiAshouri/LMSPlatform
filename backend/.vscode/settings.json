@@ -1,0 +1,6 @@
+{
+    "workbench.iconTheme": "material-icon-theme",
+    "jupyter.themeMatplotlibPlots": false,
+    "jetbrains-file-icon-theme.enableGoTestIcons": false,
+    "material-icon-theme.activeIconPack": "react"
+}

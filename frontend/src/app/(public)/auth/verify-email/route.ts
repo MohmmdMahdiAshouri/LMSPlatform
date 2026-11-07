@@ -2,20 +2,36 @@ import { API_CONFIG } from '@/shared/lib/client/api.config';
 import { redirect } from 'next/navigation';
 
 export async function GET(req: Request) {
-    const token = new URL(req.url).searchParams.get('verification-token');
-    if (!token) redirect('/auth/verify-email/failed?reason=missing');
+    const url = new URL(req.url);
+    const token =
+        url.searchParams.get('token') ||
+        url.searchParams.get('verificationToken') ||
+        url.searchParams.get('verification-token');
+
+    if (!token) {
+        redirect('/auth/verify-email/failed?reason=missing');
+    }
 
     let ok = false;
+    let hasNetworkError = false;
+
     try {
-        const res = await fetch(`${API_CONFIG.SERVER_BASE_URL}/auth/verify-email`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ verificationToken: token }),
-            cache: 'no-store',
-        });
+        const res = await fetch(
+            `${API_CONFIG.SERVER_BASE_URL}/verification/verify-email`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ verificationToken: token }),
+                cache: 'no-store',
+            },
+        );
         ok = res.ok;
     } catch (error) {
         console.error('verify-email fetch failed:', error);
+        hasNetworkError = true;
+    }
+
+    if (hasNetworkError) {
         redirect('/auth/verify-email/failed?reason=network');
     }
 
