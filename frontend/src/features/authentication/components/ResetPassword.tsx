@@ -25,7 +25,11 @@ const isValidate = z.object({
 });
 export default function ResetPassword() {
     const searchParams = useSearchParams();
-    const token = searchParams.get('password-reset-token') as string;
+    const token =
+        (searchParams.get('token') ||
+            searchParams.get('password-reset-token') ||
+            searchParams.get('resetToken') ||
+            '') as string;
 
     const [input, setInput] = useState<string>('');
     const [error, setError] = useState<string>('');

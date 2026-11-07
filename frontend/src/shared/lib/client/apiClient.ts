@@ -86,7 +86,7 @@ apiClient.interceptors.response.use(
             return Promise.reject(error);
         }
 
-        if (originalRequest.url === '/auth/refresh-token') {
+        if (originalRequest.url?.includes('refresh-token')) {
             useAuthStore.getState().clear();
             return Promise.reject(error);
         }
@@ -105,7 +105,7 @@ apiClient.interceptors.response.use(
 
         try {
             const response = await axios.post(
-                `${API_CONFIG.CLIENT_BASE_URL}/auth/refresh-token`,
+                `${API_CONFIG.CLIENT_BASE_URL}/authentication/refresh-token`,
                 {},
                 { withCredentials: true },
             );

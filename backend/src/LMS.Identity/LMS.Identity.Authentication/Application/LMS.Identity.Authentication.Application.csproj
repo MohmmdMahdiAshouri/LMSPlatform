@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>LMS.Identity.Authentication.Application</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\LMS.Identity.Authentication.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Shared\LMS.Shared.Common\LMS.Shared.Common.csproj" />
+    <ProjectReference Include="..\..\..\Shared\LMS.Shared.Domain\LMS.Shared.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Shared\LMS.Shared.Application\LMS.Shared.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+</Project>

@@ -1,8 +1,0 @@
-export enum ApprovalRequestType {
-    ROLE_CREATE = 'ROLE_CREATE',
-    ROLE_UPDATE = 'ROLE_UPDATE',
-    ROLE_DELETE = 'ROLE_DELETE',
-    ROLE_ASSIGN = 'ROLE_ASSIGN',
-    ROLE_CHANGE = 'ROLE_CHANGE',
-    ROLE_REMOVE = 'ROLE_REMOVE',
-}

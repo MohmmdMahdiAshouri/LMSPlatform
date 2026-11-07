@@ -21,7 +21,10 @@ const setAccessToken = useAuthStore.getState().setAccessToken;
 const clear = useAuthStore.getState().clear
 
 export function useSignUp() {
+    const queryClient = useQueryClient();
     const router = useRouter();
+    const setAccessToken = useAuthStore((state) => state.setAccessToken);
+
     return useMutation({
         mutationFn: (values: SignUpFormValues) => {
             const { confirmPassword, ...payload } = values;
@@ -30,7 +33,9 @@ export function useSignUp() {
         onSuccess: (res) => {
             if (!res.data) return;
             setAccessToken(res.data.accessToken);
-            router.replace('/dashboard')
+            queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
+            router.replace('/dashboard');
+            router.refresh();
         },
         onError: (error) => {
             alert(getErrorMessage(error));
@@ -40,6 +45,7 @@ export function useSignUp() {
 export function useSignIn() {
     const queryClient = useQueryClient();
     const router = useRouter();
+    const setAccessToken = useAuthStore((state) => state.setAccessToken);
     
     return useMutation({
         mutationFn: signInService,
@@ -47,7 +53,8 @@ export function useSignIn() {
             if (!res.data) return;
             setAccessToken(res.data.accessToken);
             queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
-            router.replace('/dashboard')
+            router.replace('/dashboard');
+            router.refresh();
         },
         onError: (error) => {
             alert(getErrorMessage(error));
@@ -120,14 +127,17 @@ export function useSessions() {
 export function useLogoutCurrent() {
     const router = useRouter()
     const queryClient = useQueryClient();
+    const clear = useAuthStore((state) => state.clear);
+
     return useMutation({
         mutationFn: logoutCurrent,
         onSuccess: (res) => {
             clear();
             queryClient.setQueryData(['auth', 'me'], null);
-            queryClient.removeQueries({queryKey: ['auth']})
+            queryClient.removeQueries({queryKey: ['auth']});
 
-            router.replace('/')
+            router.replace('/');
+            router.refresh();
         },
         onError: (error) => {
             alert(getErrorMessage(error));

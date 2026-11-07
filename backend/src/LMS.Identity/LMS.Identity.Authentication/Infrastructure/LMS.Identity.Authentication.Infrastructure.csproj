@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>LMS.Identity.Authentication.Infrastructure</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\LMS.Identity.Authentication.Domain.csproj" />
+    <ProjectReference Include="..\Application\LMS.Identity.Authentication.Application.csproj" />
+    <ProjectReference Include="..\..\..\Shared\LMS.Shared.Common\LMS.Shared.Common.csproj" />
+    <ProjectReference Include="..\..\..\Shared\LMS.Shared.Domain\LMS.Shared.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Shared\LMS.Shared.Infrastructure\LMS.Shared.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="BCrypt.Net-Next" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+  </ItemGroup>
+
+</Project>

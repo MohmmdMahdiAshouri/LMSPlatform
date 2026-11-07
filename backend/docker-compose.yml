@@ -1,0 +1,108 @@
+name: backend-dot-net
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: lms-sqlserver
+    cpuset: "0-3"
+    mem_limit: 3072m
+    environment:
+      ACCEPT_EULA: 'Y'
+      MSSQL_SA_PASSWORD: 'Lms_Dev_Pa55w0rd!'
+    ports:
+      - '1433:1433'
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test:
+        - 'CMD-SHELL'
+        - /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -C -b -Q "SELECT 1" -o /dev/null
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:latest
+    container_name: lms-cloudbeaver
+    cpuset: "9"
+    mem_limit: 512m
+    ports:
+      - '8978:8978'
+    depends_on:
+      - sqlserver
+    volumes:
+      - cloudbeaver_data:/opt/cloudbeaver/workspace
+
+  redis:
+    image: redis:8-alpine
+    container_name: lms-redis-2
+    cpuset: "8"
+    mem_limit: 512m
+    ports:
+      - '6380:6379'
+    volumes:
+      - lms-redis-2-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: lms-mailhog
+    cpuset: "9"
+    mem_limit: 256m
+    ports:
+      - '1026:1025' # SMTP
+      - '8026:8025' # Web UI
+
+  aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:latest
+    container_name: lms-aspire-dashboard
+    cpuset: "9"
+    mem_limit: 512m
+    environment:
+      DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: 'true'
+    ports:
+      - '18888:18888' # Dashboard Web UI
+      - '18889:18889' # OTLP gRPC endpoint
+      - '18890:18890' # OTLP HTTP endpoint
+      - '4317:18889'  # Standard OTLP gRPC port
+
+  api:
+    build:
+      context: .
+      dockerfile: src/Bootstrappers/LMS.Api/Dockerfile
+    container_name: lms-api
+    cpuset: "4-7"
+    mem_limit: 2048m
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+    environment:
+      ConnectionStrings__SqlServer: 'Server=sqlserver,1433;Database=lms;User Id=sa;Password=Lms_Dev_Pa55w0rd!;TrustServerCertificate=True;MultipleActiveResultSets=true;Max Pool Size=200'
+      ConnectionStrings__Redis: 'redis:6379'
+      Redis__ConnectionString: 'redis:6379'
+      Smtp__Host: 'mailhog'
+      Smtp__Port: '1025'
+      OpenTelemetry__Endpoint: 'http://aspire-dashboard:18889'
+      OpenTelemetry__ServiceName: 'LMS.Api'
+      ASPNETCORE_ENVIRONMENT: 'Production'
+      DOTNET_gcServer: '1'
+      DOTNET_GCHeapHardLimitPercent: '75'
+      Serilog__MinimumLevel__Default: 'Information'
+      Serilog__MinimumLevel__Override__Microsoft.AspNetCore: 'Warning'
+      Serilog__MinimumLevel__Override__Microsoft.EntityFrameworkCore: 'Warning'
+    ports:
+      - '8080:8080'
+
+volumes:
+  sqlserver_data:
+  cloudbeaver_data:
+  lms-redis-2-data:

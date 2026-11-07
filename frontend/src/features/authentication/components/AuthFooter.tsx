@@ -16,7 +16,7 @@ export function AuthFooter() {
 
             {/* Social */}
             <a
-                href={`${API_CONFIG.CLIENT_BASE_URL}/auth/google`}
+                href={`${API_CONFIG.CLIENT_BASE_URL}/authentication/google`}
                 className="flex items-center text-md justify-center gap-2 rounded-md border border-border bg-card py-2.5 font-medium text-foreground transition-colors hover:bg-muted"
             >
                 <span className="font-bold">G</span>
